@@ -2,6 +2,7 @@ import { usePathname, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { getSkipAuth } from '~/src/utils/storage/auth/skipAuth';
 
 type Props = {
   children: Readonly<React.ReactNode>;

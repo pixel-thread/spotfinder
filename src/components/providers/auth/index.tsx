@@ -12,6 +12,8 @@ import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
 import { getToken } from '~/src/utils/storage/token';
 import { getUserFromStorage, removeUser, saveUser } from '~/src/utils/storage/user';
+import { getSkipAuth } from '~/src/utils/storage/auth/skipAuth';
+import { useRouter } from 'expo-router';
 
 type Props = {
   children: Readonly<React.ReactNode>;
@@ -29,7 +31,7 @@ const onSuccessLogout = async () => {
 export const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = React.useState<UserT | null>(null);
   const [isInitial, setIsInitial] = React.useState(true);
-
+  const router = useRouter();
   const { mutate, isPending: isAuthLoading } = useMutation({
     mutationKey: ['user'],
     mutationFn: () => http.get<UserT>(AUTH_ENDPOINT.GET_ME),
@@ -56,6 +58,11 @@ export const AuthProvider = ({ children }: Props) => {
 
   const verifyUser = async () => {
     try {
+      const isSkipLogin = await getSkipAuth();
+      if (isSkipLogin) {
+        logger('Skipping Auth');
+        return;
+      }
       const userFromStorage = await getUserFromStorage();
 
       if (userFromStorage) {

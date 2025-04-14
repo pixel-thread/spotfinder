@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { AUTH_TOKEN_KEY } from '~/src/libs/constants/token';
+import { AUTH_TOKEN_KEY } from '~/src/libs/constants/auth';
 
 class TokenError extends Error {
   constructor(message: string) {

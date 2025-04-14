@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { AUTH_USER_KEY } from '~/src/libs/constants/token';
+import { AUTH_USER_KEY } from '~/src/libs/constants/auth';
 import { UserT } from '~/src/types/auth/context';
 import { removeToken } from '../token';
 
