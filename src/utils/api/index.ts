@@ -3,7 +3,7 @@ import axios from 'axios';
 import { getToken } from '../storage/token';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: process.env.EXPO_PUBLIC_API_URL as string,
   timeout: 10000,
 });
 
