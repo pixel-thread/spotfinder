@@ -10,7 +10,7 @@ import { MainProviders } from '~/src/components/providers';
 export default function RootLayout() {
   return (
     <Suspense>
-      <SafeAreaView className="flex-1 bg-gray-900">
+      <SafeAreaView className="flex-1 bg-gray-200">
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

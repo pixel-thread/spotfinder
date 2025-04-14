@@ -11,5 +11,5 @@ export const Container = ({ children, className }: ContainerProps) => {
 };
 
 const styles = {
-  container: 'flex flex-1 m-6',
+  container: 'flex flex-1 px-3',
 };
