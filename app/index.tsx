@@ -1,29 +1,12 @@
 import { useRouter } from 'expo-router';
-import { YStack, Card, XStack, Text, Button } from 'tamagui';
+import { Text } from 'react-native';
 import { Container } from '~/src/components/Container';
-import { LoginForm } from '~/src/components/page/home/LoginForm';
 
 const LoginPage = () => {
   const router = useRouter();
   return (
     <Container>
-      <YStack
-        flex={1}
-        justifyContent="center"
-        className="bg-red-500"
-        alignItems="center"
-        padding="$4">
-        <Card elevate size="$4" bordered width="100%" maxWidth={400} padding="$4">
-          <LoginForm />
-
-          <XStack justifyContent="center" alignItems="center" marginTop="$2">
-            <Text className="text-gray-600">Don't have an account? </Text>
-            <Button onPress={() => router.push('/register')} size="$2" chromeless>
-              Sign Up
-            </Button>
-          </XStack>
-        </Card>
-      </YStack>
+      <Text>Login</Text>
     </Container>
   );
 };

@@ -1,5 +1,4 @@
-import { View, Image } from 'react-native';
-import { Spinner, Text } from 'tamagui';
+import { View, Image, Text } from 'react-native';
 
 export const SplashScreen = () => {
   return (
@@ -8,7 +7,6 @@ export const SplashScreen = () => {
       <Text className="text-3xl font-bold text-white">
         {process.env.EXPO_PUBLIC_APP_NAME as string}
       </Text>
-      <Spinner size="large" color="$blue10" />
     </View>
   );
 };
