@@ -1,46 +1,49 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { AUTH_USER_KEY } from '~/src/libs/constants/token';
+import { UserT } from '~/src/types/auth/context';
 
 class UserError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'TokenError';
+    this.name = 'UserError';
   }
 }
 
-const TOKEN_KEY = AUTH_USER_KEY;
+const USER_KEY = AUTH_USER_KEY;
 
-const validateUser = (token: string): boolean => {
-  // Basic validation - adjust according to your token format
-  return typeof token === 'string' && token.length > 10;
+const validateUser = (user: UserT): boolean => {
+  return !!(user && user.id);
 };
 
-export const saveUser = async (token: string): Promise<void> => {
-  if (!validateUser(token)) {
-    throw new UserError('Invalid token format');
+export const saveUser = async (user: UserT): Promise<void> => {
+  if (!validateUser(user)) {
+    throw new UserError('Invalid user data');
   }
 
   try {
-    await AsyncStorage.setItem(TOKEN_KEY, token);
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch (error: any) {
-    throw new UserError(`Failed to save token: ${error.message}`);
+    throw new UserError(`Failed to save user: ${error.message}`);
   }
 };
 
-export const getUser = async (): Promise<string | null> => {
+export const getUserFromStorage = async (): Promise<UserT | null> => {
   try {
-    const token = await AsyncStorage.getItem(TOKEN_KEY);
-    return token && validateUser(token) ? token : null;
+    const userData = await AsyncStorage.getItem(USER_KEY);
+    if (!userData) return null;
+
+    const user = JSON.parse(userData) as UserT;
+    return validateUser(user) ? user : null;
   } catch (error: any) {
-    throw new UserError(`Failed to retrieve token: ${error.message}`);
+    throw new UserError(`Failed to retrieve user: ${error.message}`);
   }
 };
 
 export const removeUser = async (): Promise<void> => {
   try {
-    await AsyncStorage.removeItem(TOKEN_KEY);
+    await AsyncStorage.removeItem(USER_KEY);
   } catch (error: any) {
-    throw new UserError(`Failed to remove token: ${error.message}`);
+    throw new UserError(`Failed to remove user: ${error.message}`);
   }
 };

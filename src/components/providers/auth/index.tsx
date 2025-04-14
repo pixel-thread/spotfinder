@@ -1,11 +1,17 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
+
+import { SplashScreen } from '../../SplashScreen';
+import { Ternary } from '../../Ternary';
 
 import { AuthContext } from '~/src/context/auth';
 import { AUTH_ENDPOINT } from '~/src/libs/endpoints/auth';
 import { AuthContextI, UserT } from '~/src/types/auth/context';
 import http from '~/src/utils/https';
+import { logger } from '~/src/utils/logger';
 import { getToken } from '~/src/utils/storage/token';
+import { getUserFromStorage, saveUser } from '~/src/utils/storage/user';
+import LoginPage from '~/app';
 
 type Props = {
   children: Readonly<React.ReactNode>;
@@ -18,28 +24,60 @@ export const AuthProvider = ({ children }: Props) => {
   const { mutate, isPending: isAuthLoading } = useMutation({
     mutationKey: ['user'],
     mutationFn: () => http.get<UserT>(AUTH_ENDPOINT.GET_ME),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.success) {
-        setUser(data.data);
-        return data.data;
+        const userData = data?.data;
+        setUser(userData);
+        if (userData) {
+          await saveUser(userData);
+          logger('Saving User To Storage after fetching');
+          logger('Initializing Auth Completed');
+          return userData;
+        }
       }
+      logger('User failed to verify');
       setUser(null);
     },
-    onError: () => {
+    onError: (error) => {
       setUser(null);
+      logger({ message: 'Fetching user failed', error });
     },
   });
+
+  const verifyUser = async () => {
+    try {
+      const userFromStorage = await getUserFromStorage();
+
+      if (userFromStorage) {
+        logger('Setting User From Storage');
+        setUser(userFromStorage);
+        logger('User Set From Storage');
+        logger('Initializing Auth Completed');
+        return;
+      }
+
+      const token = await getToken();
+
+      if (token) {
+        mutate();
+        logger('Getting User From Token');
+      } else {
+        setUser(null);
+        logger<string>('No token or user found in storage');
+      }
+    } catch (error) {
+      setUser(null);
+      logger({ message: 'Error verifying user', error });
+    } finally {
+      setIsInitial(false);
+    }
+  };
 
   useEffect(() => {
     const initializeAuth = async () => {
       if (isInitial) {
-        const token = await getToken();
-        if (token) {
-          mutate();
-        } else {
-          setUser(null);
-        }
-        setIsInitial(false);
+        logger('Initializing Auth');
+        await verifyUser();
       }
     };
 
@@ -51,5 +89,13 @@ export const AuthProvider = ({ children }: Props) => {
     isAuthLoading,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <Ternary
+        condition={isInitial || isAuthLoading}
+        trueComponent={<SplashScreen />}
+        falseComponent={children}
+      />
+    </AuthContext.Provider>
+  );
 };

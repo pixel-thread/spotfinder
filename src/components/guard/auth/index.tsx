@@ -21,7 +21,6 @@ export const AuthGuard = ({ children }: Props) => {
   }, [user, isAuthLoading]);
 
   useEffect(() => {
-    console.log('User=>', user);
     if (publicPaths.includes(pathname) && user) {
       router.replace('/dashboard');
     }

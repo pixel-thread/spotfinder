@@ -1,5 +1,7 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
+import { logger } from '../logger';
+
 import { MetaT } from '~/src/types/meta';
 import axiosInstance from '~/src/utils/api';
 
@@ -13,6 +15,7 @@ export interface ApiResponse<T> {
 }
 
 export const handleAxiosError = <T>(error: unknown): ApiResponse<T> => {
+  logger(error);
   let errorMessage = 'Something went wrong. Please try again.';
   let errorDetails: string | Record<string, unknown> = '';
 
