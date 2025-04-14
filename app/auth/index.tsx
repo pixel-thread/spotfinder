@@ -38,7 +38,7 @@ export default function LoginPage() {
         </View>
         {/* Footer Link */}
         <View className="flex-row items-center justify-center space-x-1">
-          <Link href="/" asChild>
+          <Link href="/dashboard" asChild>
             <Button variant="ghost" size="sm">
               Skip
             </Button>

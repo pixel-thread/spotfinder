@@ -1,4 +1,4 @@
-import { Slot } from 'expo-router';
+import { Slot, Tabs } from 'expo-router';
 import { Suspense } from 'react';
 import { KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

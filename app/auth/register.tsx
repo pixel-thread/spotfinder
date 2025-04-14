@@ -34,6 +34,13 @@ export default function RegisterPage() {
             </Button>
           </Link>
         </View>
+        <View className="flex-row items-center justify-center space-x-1">
+          <Link href="/dashboard" asChild>
+            <Button variant="ghost" size="sm">
+              Skip
+            </Button>
+          </Link>
+        </View>
       </View>
     </Container>
   );

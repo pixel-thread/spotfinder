@@ -22,7 +22,7 @@ export const AuthGuard = ({ children }: Props) => {
 
   useEffect(() => {
     if (publicPaths.includes(pathname) && user) {
-      router.replace('/');
+      router.replace('/dashboard');
     }
   }, [pathname, user]);
 
