@@ -1,9 +1,9 @@
 import { View, Text } from 'tamagui';
 
-export default function HomeScreen() {
+export default function ProfileScreen() {
   return (
     <View flex={1} justifyContent="center" alignItems="center">
-      <Text>Home Screen</Text>
+      <Text>Profile Screen</Text>
     </View>
   );
 }
