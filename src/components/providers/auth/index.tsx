@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 
 import { SplashScreen } from '../../SplashScreen';
 import { Ternary } from '../../Ternary';
+import { toast } from '../../ui/toast';
 
 import { AuthContext } from '~/src/context/auth';
 import { AUTH_ENDPOINT } from '~/src/libs/endpoints/auth';
@@ -10,11 +11,19 @@ import { AuthContextI, UserT } from '~/src/types/auth/context';
 import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
 import { getToken } from '~/src/utils/storage/token';
-import { getUserFromStorage, saveUser } from '~/src/utils/storage/user';
-import LoginPage from '~/app';
+import { getUserFromStorage, removeUser, saveUser } from '~/src/utils/storage/user';
 
 type Props = {
   children: Readonly<React.ReactNode>;
+};
+
+const onSuccessLogout = async () => {
+  try {
+    await removeUser();
+  } catch (error) {
+    logger({ message: 'Failed to logout', error });
+    toast.error('Failed to logout');
+  }
 };
 
 export const AuthProvider = ({ children }: Props) => {
@@ -41,6 +50,7 @@ export const AuthProvider = ({ children }: Props) => {
     onError: (error) => {
       setUser(null);
       logger({ message: 'Fetching user failed', error });
+      toast.error('Failed to fetch user');
     },
   });
 
@@ -73,6 +83,20 @@ export const AuthProvider = ({ children }: Props) => {
     }
   };
 
+  const { mutate: onLogout, isPending: isLogoutPending } = useMutation({
+    mutationFn: () => http.post(AUTH_ENDPOINT.POST_LOGOUT),
+    onSuccess: async () => {
+      onSuccessLogout();
+      setUser(null);
+      logger('Logout Successfull');
+    },
+    onError: (error) => {
+      setUser(null);
+      logger({ message: 'Failed to logout but still logged locally', error });
+      toast.error('Failed to logout');
+    },
+  });
+
   useEffect(() => {
     const initializeAuth = async () => {
       if (isInitial) {
@@ -85,8 +109,9 @@ export const AuthProvider = ({ children }: Props) => {
   }, [isInitial, mutate]);
 
   const value: AuthContextI = {
-    user: user,
-    isAuthLoading: isAuthLoading,
+    user,
+    onLogout,
+    isAuthLoading: isAuthLoading || isLogoutPending,
     refresh: verifyUser,
   };
 

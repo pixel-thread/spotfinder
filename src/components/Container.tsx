@@ -1,7 +1,13 @@
 import { SafeAreaView } from 'react-native';
+import { cn } from '../libs';
 
-export const Container = ({ children }: { children: React.ReactNode }) => {
-  return <SafeAreaView className={styles.container}>{children}</SafeAreaView>;
+type ContainerProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+export const Container = ({ children, className }: ContainerProps) => {
+  return <SafeAreaView className={cn(className, styles.container)}>{children}</SafeAreaView>;
 };
 
 const styles = {

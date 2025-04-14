@@ -20,5 +20,6 @@ export type UserT = {
 export interface AuthContextI {
   user: UserT | null;
   isAuthLoading: boolean;
+  onLogout: () => void;
   refresh: () => void;
 }

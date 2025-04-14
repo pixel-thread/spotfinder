@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { AUTH_USER_KEY } from '~/src/libs/constants/token';
 import { UserT } from '~/src/types/auth/context';
+import { removeToken } from '../token';
 
 class UserError extends Error {
   constructor(message: string) {
@@ -43,6 +44,7 @@ export const getUserFromStorage = async (): Promise<UserT | null> => {
 export const removeUser = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(USER_KEY);
+    await removeToken();
   } catch (error: any) {
     throw new UserError(`Failed to remove user: ${error.message}`);
   }

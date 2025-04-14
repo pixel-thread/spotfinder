@@ -7,7 +7,7 @@ type Props = {
   children: Readonly<React.ReactNode>;
 };
 
-const publicPaths = ['/register', '/'];
+const publicPaths = ['/auth/register', '/auth'];
 
 export const AuthGuard = ({ children }: Props) => {
   const { user, isAuthLoading } = useAuth();
@@ -16,7 +16,7 @@ export const AuthGuard = ({ children }: Props) => {
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
-      router.replace('/');
+      router.replace('/auth');
     }
   }, [user, isAuthLoading]);
 
