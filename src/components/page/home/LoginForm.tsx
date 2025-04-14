@@ -20,7 +20,9 @@ import {
 import { AUTH_ENDPOINT } from '~/src/libs/endpoints/auth';
 import http from '~/src/utils/https';
 import { loginSchema } from '~/src/utils/validation/auth';
-import { getToken, saveToken } from '~/src/utils/storage/token';
+import { saveToken } from '~/src/utils/storage/token';
+import { useAuth } from '~/src/hooks/auth/useAuth';
+import { logger } from '~/src/utils/logger';
 
 type FormValues = {
   phone: string;
@@ -29,6 +31,7 @@ type FormValues = {
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const queryClient = useQueryClient();
+  const { refresh } = useAuth();
   const form = useForm<Required<FormValues>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -42,9 +45,12 @@ export const LoginForm = () => {
     mutationFn: (data: FormValues) => http.post<{ token: string }>(AUTH_ENDPOINT.POST_LOGIN, data),
     onSuccess: async (data) => {
       if (data.success) {
+        logger('Login Success');
         if (data.token) {
           queryClient.invalidateQueries({ queryKey: ['user'] });
           saveToken(data.token);
+          logger('Refreshing Token');
+          refresh();
         }
         return data.data;
       }

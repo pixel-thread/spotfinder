@@ -1,9 +1,9 @@
-import { View, Text } from 'tamagui';
+import { Text, View } from 'react-native';
 
 export default function HomeScreen() {
   return (
-    <View flex={1} justifyContent="center" alignItems="center">
-      <Text color={'black'}>Home Screen</Text>
+    <View className="flex h-screen items-center justify-center bg-green-400">
+      <Text>Dashboard</Text>
     </View>
   );
 }

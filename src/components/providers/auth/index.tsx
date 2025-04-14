@@ -85,8 +85,9 @@ export const AuthProvider = ({ children }: Props) => {
   }, [isInitial, mutate]);
 
   const value: AuthContextI = {
-    user,
-    isAuthLoading,
+    user: user,
+    isAuthLoading: isAuthLoading,
+    refresh: verifyUser,
   };
 
   return (
