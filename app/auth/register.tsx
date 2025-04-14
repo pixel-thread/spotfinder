@@ -2,7 +2,6 @@ import { Link } from 'expo-router';
 import { View } from 'react-native';
 
 import { Container } from '~/src/components/Container';
-import { LoginForm } from '~/src/components/page/auth/login-form';
 import { RegisterForm } from '~/src/components/page/auth/register-form';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';

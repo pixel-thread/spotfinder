@@ -5,8 +5,12 @@ import { Container } from '~/src/components/Container';
 import { LoginForm } from '~/src/components/page/auth/login-form';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
+import { saveSkipAuth } from '~/src/utils/storage/auth/skipAuth';
 
 export default function LoginPage() {
+  const onPressSkip = async () => {
+    return await saveSkipAuth(true);
+  };
   return (
     <Container className="flex-1 justify-center px-4">
       <View className="flex w-full max-w-md flex-col gap-6 self-center">
@@ -38,7 +42,7 @@ export default function LoginPage() {
         </View>
         {/* Footer Link */}
         <View className="flex-row items-center justify-center space-x-1">
-          <Link href="/dashboard" asChild>
+          <Link href="/dashboard" onPress={onPressSkip} asChild>
             <Button variant="ghost" size="sm">
               Skip
             </Button>
