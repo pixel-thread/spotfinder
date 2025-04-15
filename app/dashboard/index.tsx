@@ -1,8 +1,9 @@
-import { View, ScrollView, TouchableOpacity, FlatList, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
+
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
-import { Ionicons } from '@expo/vector-icons';
 
 const quickActions = [
   { label: 'Find Spot', icon: 'car', bg: 'bg-blue-100', color: 'text-blue-600' },
@@ -42,6 +43,12 @@ const newParkingOptions = [
 
 const activeParking = [
   { id: 1, name: 'Downtown Garage', timeLeft: '1h 23m left', spot: 'A-12' },
+  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
+  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
+  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
+  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
+  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
+  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
   { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
 ];
 
