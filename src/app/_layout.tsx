@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import '../global.css';
+import './global.css';
 
 import { MainProviders } from '~/src/components/providers';
 

@@ -49,9 +49,7 @@ const ProfilePage = () => {
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="bg-blue-600 px-4 pb-8 pt-6">
-          <Typography className="mb-6 text-xl font-bold text-white">Profile</Typography>
-
+        <View className="rounded-lg bg-blue-600 px-4 pb-8 pt-6">
           <View className="flex-row items-center">
             <View className="mr-4 h-20 w-20 items-center justify-center rounded-full bg-white/20">
               {user?.profilePic ? (

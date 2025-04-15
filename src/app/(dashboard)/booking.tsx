@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { useRouter } from 'expo-router';
 
 const parkingData = [
   {
@@ -53,7 +54,7 @@ const parkingData = [
 ];
 
 const BookingPage = () => {
-  const { onLogout } = useAuth();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
 
@@ -66,9 +67,9 @@ const BookingPage = () => {
   );
 
   return (
-    <Container className="flex-1 bg-gray-50">
+    <Container className="flex-1">
       {/* Header */}
-      <View className="bg-white px-4 pb-4 pt-6">
+      <View className="mt-2 rounded-lg bg-white p-4">
         <Text className="mb-4 text-xl font-bold text-gray-900">Find Parking</Text>
 
         {/* Search Bar */}
@@ -143,7 +144,11 @@ const BookingPage = () => {
                   </View>
                 </View>
 
-                <Button className="mt-3 w-full bg-blue-500">Book Now</Button>
+                <Button
+                  onPress={() => router.push(`/parking/${parking.id}`)}
+                  className="mt-3 w-full bg-blue-500">
+                  Book Now
+                </Button>
               </View>
             </TouchableOpacity>
           ))

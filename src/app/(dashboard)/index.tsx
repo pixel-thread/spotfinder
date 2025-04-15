@@ -57,32 +57,33 @@ const HomePage = () => {
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header */}
-        <View className="mb-6 flex-row items-center justify-between">
-          <View>
-            <Typography variant="heading">Hello 👋</Typography>
-            <Typography variant="heading" className="text-2xl font-bold">
-              Welcome Back
-            </Typography>
-          </View>
-          <TouchableOpacity className="rounded-full bg-gray-100 p-2">
-            <Ionicons name="notifications-outline" size={24} color="#4c669f" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Quick Actions */}
-        <View className="mb-6 flex-row justify-between gap-2">
-          {quickActions.map((action, idx) => (
-            <TouchableOpacity
-              key={idx}
-              className={`flex-1 items-center justify-center rounded-xl p-3 ${action.bg}`}>
-              <Ionicons name={action.icon as any} size={24} color="#333" />
-              <Typography className={`mt-1 text-sm font-medium ${action.color}`}>
-                {action.label}
+        <View className="my-2 rounded-lg bg-white p-4">
+          <View className="my-6 flex-row items-center justify-between rounded-lg">
+            <View>
+              <Typography variant="heading">Hello 👋</Typography>
+              <Typography variant="heading" className="text-2xl font-bold">
+                Welcome Back
               </Typography>
+            </View>
+            <TouchableOpacity className="rounded-full bg-gray-100 p-2">
+              <Ionicons name="notifications-outline" size={24} color="#333" />
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
 
+          {/* Quick Actions */}
+          <View className="mb-6 flex-row justify-between gap-2">
+            {quickActions.map((action, idx) => (
+              <TouchableOpacity
+                key={idx}
+                className={`flex-1 items-center justify-center rounded-xl p-3 ${action.bg}`}>
+                <Ionicons name={action.icon as any} size={24} color="#333" />
+                <Typography className={`mt-1 text-sm font-medium ${action.color}`}>
+                  {action.label}
+                </Typography>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
         {/* Active Parking Section */}
         {activeParking.length > 0 && (
           <View className="mb-6">
