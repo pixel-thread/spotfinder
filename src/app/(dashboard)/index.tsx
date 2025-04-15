@@ -1,9 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
-import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'expo-router';
+import { View, ScrollView, TouchableOpacity, Image, Text } from 'react-native';
+import { z } from 'zod';
 
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
+import { useAuth } from '~/src/hooks/auth/useAuth';
+import http from '~/src/utils/https';
+import { parkingSchema } from '~/src/utils/validation/parking';
 
 const quickActions = [
   { label: 'Find Spot', icon: 'car', bg: 'bg-blue-100', color: 'text-blue-600' },
@@ -17,30 +23,6 @@ const recentSpots = [
   { name: 'Harbor View Parking', time: 'Sun, 10:30 AM', price: '$12.00', distance: '1.2 mi' },
 ];
 
-const newParkingOptions = [
-  {
-    id: 1,
-    name: 'Central Mall Parking',
-    price: '$4/hr',
-    distance: '0.5 mi',
-    image: 'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?ixlib=rb-4.0.3',
-  },
-  {
-    id: 2,
-    name: 'Riverside Garage',
-    price: '$6/hr',
-    distance: '1.2 mi',
-    image: 'https://images.unsplash.com/photo-1590674899484-13d6c7094a9f?ixlib=rb-4.0.3',
-  },
-  {
-    id: 3,
-    name: 'Tech Park Lot',
-    price: '$3/hr',
-    distance: '0.8 mi',
-    image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-4.0.3',
-  },
-];
-
 const activeParking = [
   { id: 1, name: 'Downtown Garage', timeLeft: '1h 23m left', spot: 'A-12' },
   { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
@@ -52,7 +34,17 @@ const activeParking = [
   { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
 ];
 
+type ParkingDetail = z.infer<typeof parkingSchema>;
+
 const HomePage = () => {
+  const { user } = useAuth();
+  const { data: recentParking } = useQuery({
+    queryKey: ['parking'],
+    queryFn: () => http.get<ParkingDetail[]>(`/parking`),
+    select: (data) => data.data,
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+  });
   return (
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
@@ -138,28 +130,57 @@ const HomePage = () => {
           <Typography className="mb-3 text-lg font-medium text-gray-800">
             New Parking Options
           </Typography>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {newParkingOptions.map((parking, idx) => (
-              <TouchableOpacity
-                key={`new-${idx}`}
-                className="mr-3 w-56 overflow-hidden rounded-xl bg-white shadow-sm">
-                <View className="h-32 w-full bg-gray-200">
-                  {parking.image && (
-                    <Image
-                      source={{ uri: parking.image }}
-                      className="h-full w-full"
-                      resizeMode="cover"
-                    />
-                  )}
-                </View>
-                <View className="p-3">
-                  <Typography className="font-semibold text-gray-900">{parking.name}</Typography>
-                  <View className="mt-1 flex-row items-center justify-between">
-                    <Typography className="font-bold text-blue-600">{parking.price}</Typography>
-                    <Typography className="text-sm text-gray-500">{parking.distance}</Typography>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex flex-row">
+            {recentParking?.map((parking, idx) => (
+              <Link href={`/parking/${parking.id}`} key={parking.id} asChild>
+                <TouchableOpacity className="mb-4 mr-4 w-64 overflow-hidden rounded-xl bg-white shadow-sm">
+                  <Image
+                    source={{ uri: parking.image }}
+                    className="h-40 w-full"
+                    resizeMode="cover"
+                  />
+                  <View className="p-4">
+                    <View className="mb-1 flex-row items-center justify-between">
+                      <Text className="text-lg font-bold text-gray-900" numberOfLines={1}>
+                        {parking.name}
+                      </Text>
+                      <View className="flex-row items-center">
+                        <Ionicons
+                          name={
+                            user && parking && parking?.rating?.includes(user?.id)
+                              ? 'star'
+                              : 'star-outline'
+                          }
+                          size={16}
+                          color="#f59e0b"
+                        />
+                        <Text className="ml-1 text-gray-700">{parking?.rating?.length}</Text>
+                      </View>
+                    </View>
+
+                    <Text className="mb-2 text-gray-600" numberOfLines={1}>
+                      {parking.address}
+                    </Text>
+
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-row items-center">
+                        <Ionicons name="pricetag-outline" size={16} color="#3b82f6" />
+                        <Text className="ml-1 font-semibold text-blue-600">{parking.price}</Text>
+                      </View>
+
+                      <View className="flex-row items-center">
+                        <Ionicons name="location-outline" size={16} color="#6b7280" />
+                        <Text className="ml-1 text-gray-600">{parking.distance}</Text>
+                      </View>
+                    </View>
+
+                    <View className="mt-2 flex-row items-center">
+                      <Ionicons name="car-outline" size={16} color="#10b981" />
+                      <Text className="ml-1 text-green-600">{parking.available} spots</Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </Link>
             ))}
           </ScrollView>
         </View>

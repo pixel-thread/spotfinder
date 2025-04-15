@@ -1,23 +1,51 @@
 import { Link, Stack } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Text, View, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Button } from '~/src/components/ui/button';
+import { Typography } from '~/src/components/ui/typography';
 
 export default function NotFoundScreen() {
+  const onPress = () => {
+    // Handle button press
+    console.log('Button pressed');
+  };
+  // Rest of the component code
+  // ...
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <View className={styles.container}>
-        <Text className={styles.title}>This screen doesn't exist.</Text>
-        <Link href="/" className={styles.link}>
-          <Text className={styles.linkText}>Go to home screen!</Text>
-        </Link>
+      <Stack.Screen options={{ title: 'Page Not Found', headerShown: false }} />
+      <View className="flex-1 items-center justify-center bg-white px-6">
+        <View className="w-full max-w-sm items-center">
+          {/* Error Icon/Image */}
+          <View className="mb-6 rounded-full bg-blue-50 p-6">
+            <Ionicons name="alert-circle-outline" size={80} color="#3b82f6" />
+          </View>
+
+          {/* Error Message */}
+          <Typography variant="heading" className="mb-2 text-center text-2xl font-bold">
+            Oops! Page Not Found
+          </Typography>
+
+          <Typography className="mb-8 text-center text-gray-600">
+            The page you're looking for doesn't exist or has been moved.
+          </Typography>
+
+          {/* Action Buttons */}
+          <Link href="/" asChild>
+            <Button className="mb-3 w-full bg-blue-600">Go to Home</Button>
+          </Link>
+
+          <Button onPress={onPress} variant="outline" className="w-full">
+            Go to Dashboard
+          </Button>
+        </View>
+
+        {/* Footer */}
+        <View className="absolute bottom-8 flex-row items-center">
+          <Ionicons name="car-outline" size={20} color="#6b7280" />
+          <Typography className="ml-2 text-gray-500">ParkEasy</Typography>
+        </View>
       </View>
     </>
   );
 }
-
-const styles = {
-  container: `items-center flex-1 justify-center p-5`,
-  title: `text-xl font-bold`,
-  link: `mt-4 pt-4`,
-  linkText: `text-base text-[#2e78b7]`,
-};

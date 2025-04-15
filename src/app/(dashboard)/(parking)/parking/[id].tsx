@@ -1,18 +1,23 @@
 import { useState } from 'react';
-import { View, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Image, ScrollView, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
-import { ParkingDetail, parkingData } from '~/src/libs/constants/parking/data';
 import { useQuery } from '@tanstack/react-query';
 import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
+import { z } from 'zod';
+import { parkingSchema } from '~/src/utils/validation/parking';
+import { useAuth } from '~/src/hooks/auth/useAuth';
 
+type ParkingDetail = z.infer<typeof parkingSchema>;
 export default function ParkingDetailScreen() {
+  const { user } = useAuth();
   const { id: parkingId } = useLocalSearchParams();
   const router = useRouter();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
     isLoading,
@@ -52,17 +57,43 @@ export default function ParkingDetailScreen() {
     );
   }
 
+  const handleImagePress = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
   return (
     <Container className="flex-1 bg-white">
+      {/* Image Modal */}
+      <Modal
+        visible={!!selectedImage}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeImageModal}>
+        <View className="flex-1 items-center justify-center bg-black/90">
+          <TouchableOpacity
+            className="absolute right-6 top-12 z-10 rounded-full bg-black/50 p-2"
+            onPress={closeImageModal}>
+            <Ionicons name="close" size={24} color="white" />
+          </TouchableOpacity>
+
+          {selectedImage && (
+            <Image
+              source={{ uri: selectedImage }}
+              className="h-[70%] w-full"
+              resizeMode="contain"
+            />
+          )}
+        </View>
+      </Modal>
+
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header Image */}
-        <View className="relative h-64 w-full">
+        <View className="relative h-80 w-full">
           <Image source={{ uri: parking.image }} className="h-full w-full" resizeMode="cover" />
-          <TouchableOpacity
-            className="absolute left-4 top-12 rounded-full bg-white/80 p-2"
-            onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#333" />
-          </TouchableOpacity>
         </View>
 
         {/* Main Content */}
@@ -73,8 +104,12 @@ export default function ParkingDetailScreen() {
               {parking.name}
             </Typography>
             <View className="flex-row items-center rounded-lg bg-blue-50 px-2 py-1">
-              <Ionicons name="star" size={16} color="#f59e0b" />
-              <Typography className="ml-1 font-medium">{parking.rating}</Typography>
+              <Ionicons
+                name={user && parking.rating?.includes(user?.id) ? 'star' : 'star-outline'}
+                size={16}
+                color="#f59e0b"
+              />
+              <Typography className="ml-1 font-medium">{parking.rating?.length}</Typography>
             </View>
           </View>
 
@@ -135,12 +170,13 @@ export default function ParkingDetailScreen() {
               </Typography>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {parking.gallery.map((image, index) => (
-                  <Image
-                    key={index}
-                    source={{ uri: image }}
-                    className="mr-2 h-24 w-32 rounded-lg"
-                    resizeMode="cover"
-                  />
+                  <TouchableOpacity key={index} onPress={() => handleImagePress(image)}>
+                    <Image
+                      source={{ uri: image }}
+                      className="mr-2 h-24 w-32 rounded-lg"
+                      resizeMode="cover"
+                    />
+                  </TouchableOpacity>
                 ))}
               </ScrollView>
             </View>

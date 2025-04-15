@@ -4,7 +4,7 @@ import { Container } from '~/src/components/Container';
 import { Button, buttonTextVariants } from '~/src/components/ui/button';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { Typography } from '~/src/components/ui/typography';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 type ProfileItems = {
   icon: string;
@@ -37,7 +37,7 @@ const profileSections: ProfileSection[] = [
   {
     title: 'Partnership',
     items: [
-      { icon: 'help-circle-outline', label: 'Become a Partner', route: '/profile/help' },
+      { icon: 'help-circle-outline', label: 'Become a Partner', route: '/become-partner' },
       { icon: 'settings-outline', label: 'Parking Lot', route: '/profile/settings' },
     ],
   },
@@ -71,7 +71,10 @@ const ProfilePage = () => {
           <View className="flex-row items-center">
             <View className="mr-4 h-20 w-20 items-center justify-center rounded-full bg-white/20">
               {user?.profilePic ? (
-                <Image source={{ uri: user.profilePic }} className="h-20 w-20 rounded-full" />
+                <Image
+                  src="https://avatar.iran.liara.run/public"
+                  className="h-20 w-20 rounded-full"
+                />
               ) : (
                 <Ionicons name="person" size={40} color="white" />
               )}
@@ -96,15 +99,15 @@ const ProfilePage = () => {
               </Typography>
 
               {section.items.map((item, itemIdx) => (
-                <TouchableOpacity
-                  key={itemIdx}
-                  className="flex-row items-center border-b border-gray-100 py-3 last:border-b-0">
-                  <View className="mr-3 rounded-full bg-blue-50 p-2">
-                    <Ionicons name={item.icon} size={22} color="#3b82f6" />
-                  </View>
-                  <Typography className="flex-1 text-gray-700">{item.label}</Typography>
-                  <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-                </TouchableOpacity>
+                <Link key={itemIdx} href={item.route} asChild>
+                  <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-3 last:border-b-0">
+                    <View className="mr-3 rounded-full bg-blue-50 p-2">
+                      <Ionicons name={item.icon} size={22} color="#3b82f6" />
+                    </View>
+                    <Typography className="flex-1 text-gray-700">{item.label}</Typography>
+                    <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                  </TouchableOpacity>
+                </Link>
               ))}
             </View>
           ))}
@@ -117,9 +120,17 @@ const ProfilePage = () => {
             {user ? 'Sign Out' : 'Sign In'}
           </Button>
 
-          <Typography className="mb-8 text-center text-xs text-gray-500">
-            App Version 1.0.0
-          </Typography>
+          <View className="gap-y-2">
+            <Typography variant="heading" className=" text-center text-xs text-gray-500">
+              {process.env.EXPO_PUBLIC_APP_NAME}
+            </Typography>
+            <Typography className="text-center text-xs text-gray-500">
+              {`© ${new Date().getFullYear()} Parking App. All rights reserved.`}
+            </Typography>
+            <Typography className="mb-8 text-center text-xs text-gray-500">
+              App Version 1.0.0
+            </Typography>
+          </View>
         </View>
       </ScrollView>
     </Container>

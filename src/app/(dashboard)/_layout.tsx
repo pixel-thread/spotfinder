@@ -1,9 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '~/src/hooks/auth/useAuth';
 
 export default function DashboardLayout() {
-  const { user } = useAuth();
   return (
     <Tabs
       screenOptions={{
@@ -27,17 +25,24 @@ export default function DashboardLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          headerShown: false,
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={24} />,
         }}
       />
-      {/* Hide the parking folder from tabs */}
       <Tabs.Screen
         name="(parking)"
         options={{
-          href: null, // This prevents the tab from being accessible via tab bar
-          headerShown: false,
+          href: null,
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={24} />,
+        }}
+      />
+      <Tabs.Screen
+        name="(profile)"
+        options={{
+          href: null,
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={24} />,
         }}
       />
     </Tabs>
