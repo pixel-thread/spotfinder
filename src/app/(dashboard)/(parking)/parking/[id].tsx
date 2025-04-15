@@ -1,94 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
-
-// Define proper type for parking data
-type ParkingDetail = {
-  id: number;
-  name: string;
-  address: string;
-  price: string;
-  rating: number;
-  distance: string;
-  available: number;
-  totalSpots: number;
-  openHours: string;
-  features: string[];
-  description: string;
-  image: string;
-  gallery: string[];
-};
-
-type ParkingDataType = {
-  [key: string]: ParkingDetail;
-};
-
-// Mock data - in a real app, you would fetch this from an API
-const parkingData: ParkingDataType = {
-  '1': {
-    id: 1,
-    name: 'Downtown Parking Garage',
-    address: '123 Main St, Downtown',
-    price: '$5/hr',
-    rating: 4.5,
-    distance: '0.3 mi',
-    available: 12,
-    totalSpots: 150,
-    openHours: '24/7',
-    features: ['Covered', 'Security', 'EV Charging'],
-    description:
-      'Conveniently located in the heart of downtown, this parking garage offers secure parking with 24/7 access and security monitoring.',
-    image: 'https://images.unsplash.com/photo-1470224114660-3f6686c562eb?ixlib=rb-4.0.3',
-    gallery: [
-      'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?ixlib=rb-4.0.3',
-      'https://images.unsplash.com/photo-1590674899484-13d6c7094a9f?ixlib=rb-4.0.3',
-      'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-4.0.3',
-    ],
-  },
-  '2': {
-    id: 2,
-    name: 'City Center Lot',
-    address: '456 Park Ave, City Center',
-    price: '$3/hr',
-    rating: 4.2,
-    distance: '0.7 mi',
-    available: 8,
-    totalSpots: 75,
-    openHours: '6:00 AM - 11:00 PM',
-    features: ['Outdoor', 'CCTV', 'Wheelchair Access'],
-    description:
-      'Affordable parking in the city center with easy access to shopping and restaurants. Well-lit with security cameras.',
-    image: 'https://images.unsplash.com/photo-1590674899484-13d6c7094a9f?ixlib=rb-4.0.3',
-    gallery: [
-      'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?ixlib=rb-4.0.3',
-      'https://images.unsplash.com/photo-1470224114660-3f6686c562eb?ixlib=rb-4.0.3',
-    ],
-  },
-};
+import { ParkingDetail, parkingData } from '~/src/libs/constants/parking/data';
+import { useQuery } from '@tanstack/react-query';
+import http from '~/src/utils/https';
+import { logger } from '~/src/utils/logger';
 
 export default function ParkingDetailScreen() {
   const { id: parkingId } = useLocalSearchParams();
   const router = useRouter();
-  const [parking, setParking] = useState<ParkingDetail | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate API fetch
-    setTimeout(() => {
-      const id =
-        typeof parkingId === 'string' ? parkingId : Array.isArray(parkingId) ? parkingId[0] : null;
-      if (id && parkingData[id]) {
-        setParking(parkingData[id]);
-      }
-      setLoading(false);
-    }, 500);
-  }, [parkingId]);
+  const {
+    isLoading,
+    data: parking,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['parking', parkingId],
+    queryFn: () => http.get<ParkingDetail>(`/parking/${parkingId}`),
+    select: (data) => data.data,
+  });
 
-  if (loading) {
+  if (isError) {
+    logger({ message: error.message, error });
+    return (
+      <Container className="flex-1 items-center justify-center">
+        <Typography>Error...</Typography>
+      </Container>
+    );
+  }
+  if (isLoading) {
     return (
       <Container className="flex-1 items-center justify-center">
         <Typography>Loading...</Typography>
@@ -159,7 +104,7 @@ export default function ParkingDetailScreen() {
 
           {/* Description */}
           <View className="mt-6">
-            <Typography variant="subtitle" className="mb-2 font-semibold">
+            <Typography variant="caption" className="mb-2 font-semibold">
               Description
             </Typography>
             <Typography className="text-gray-600">{parking.description}</Typography>
@@ -167,7 +112,7 @@ export default function ParkingDetailScreen() {
 
           {/* Features */}
           <View className="mt-6">
-            <Typography variant="subtitle" className="mb-2 font-semibold">
+            <Typography variant="caption" className="mb-2 font-semibold">
               Features
             </Typography>
             <View className="flex-row flex-wrap">
@@ -185,7 +130,7 @@ export default function ParkingDetailScreen() {
           {/* Gallery */}
           {parking.gallery && parking.gallery.length > 0 && (
             <View className="mt-6">
-              <Typography variant="subtitle" className="mb-2 font-semibold">
+              <Typography variant="caption" className="mb-2 font-semibold">
                 Gallery
               </Typography>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -224,7 +169,7 @@ export default function ParkingDetailScreen() {
       {/* Bottom Action Bar */}
       <View className="border-t border-gray-200 bg-white p-4">
         <Button className="w-full bg-blue-600" size="lg">
-          Book Parking
+          Book Now
         </Button>
       </View>
     </Container>

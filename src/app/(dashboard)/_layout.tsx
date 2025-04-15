@@ -7,8 +7,7 @@ export default function DashboardLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarShowLabel: false,
-        freezeOnBlur: true,
+        headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
@@ -28,6 +27,7 @@ export default function DashboardLayout() {
       <Tabs.Screen
         name="profile"
         options={{
+          headerShown: false,
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={size} />,
         }}

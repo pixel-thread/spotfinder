@@ -1,15 +1,17 @@
 import { View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '~/src/components/Container';
-import { Button } from '~/src/components/ui/button';
+import { Button, buttonTextVariants } from '~/src/components/ui/button';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { Typography } from '~/src/components/ui/typography';
+import { useRouter } from 'expo-router';
 
 type ProfileItems = {
   icon: string;
   label: string;
   route: string;
 };
+
 type ProfileSection = {
   title: string;
   items: ProfileItems[];
@@ -33,6 +35,13 @@ const profileSections: ProfileSection[] = [
     ],
   },
   {
+    title: 'Partnership',
+    items: [
+      { icon: 'help-circle-outline', label: 'Become a Partner', route: '/profile/help' },
+      { icon: 'settings-outline', label: 'Parking Lot', route: '/profile/settings' },
+    ],
+  },
+  {
     title: 'Support',
     items: [
       { icon: 'help-circle-outline', label: 'Help Center', route: '/profile/help' },
@@ -44,7 +53,16 @@ const profileSections: ProfileSection[] = [
 
 const ProfilePage = () => {
   const { user, onLogout } = useAuth();
+  const router = useRouter();
 
+  // onPress logout
+  const onPressLogout = () => {
+    if (user) {
+      onLogout();
+      return;
+    }
+    router.replace('/auth');
+  };
   return (
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -92,11 +110,11 @@ const ProfilePage = () => {
           ))}
 
           {/* Logout Button */}
-          <Button variant="outline" onPress={onLogout} className="mb-8 border-red-300">
-            <View className="flex-row items-center">
-              <Ionicons name="log-out-outline" size={20} color="#ef4444" className="mr-2" />
-              <Typography className="font-medium text-red-500">Logout</Typography>
-            </View>
+          <Button
+            variant={user ? 'destructive' : 'outline'}
+            onPress={onPressLogout}
+            className="mb-8">
+            {user ? 'Sign Out' : 'Sign In'}
           </Button>
 
           <Typography className="mb-8 text-center text-xs text-gray-500">

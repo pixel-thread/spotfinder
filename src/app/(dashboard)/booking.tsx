@@ -3,68 +3,39 @@ import { View, Text, ScrollView, TextInput, TouchableOpacity, Image } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
-import { useAuth } from '~/src/hooks/auth/useAuth';
 import { useRouter } from 'expo-router';
-
-const parkingData = [
-  {
-    id: 1,
-    name: 'Downtown Parking Garage',
-    address: '123 Main St, Downtown',
-    price: '$5/hr',
-    rating: 4.5,
-    distance: '0.3 mi',
-    available: 12,
-    image:
-      'https://images.unsplash.com/photo-1470224114660-3f6686c562eb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHBhcmtpbmclMjBnYXJhZ2V8ZW58MHx8MHx8&w=1000&q=80',
-  },
-  {
-    id: 2,
-    name: 'City Center Lot',
-    address: '456 Park Ave, City Center',
-    price: '$3/hr',
-    rating: 4.2,
-    distance: '0.7 mi',
-    available: 8,
-    image:
-      'https://images.unsplash.com/photo-1590674899484-13d6c7094a9f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cGFya2luZyUyMGxvdHxlbnwwfHwwfHw%3D&w=1000&q=80',
-  },
-  {
-    id: 3,
-    name: 'Harbor View Parking',
-    address: '789 Ocean Blvd, Harbor District',
-    price: '$7/hr',
-    rating: 4.8,
-    distance: '1.2 mi',
-    available: 25,
-    image:
-      'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGFya2luZyUyMGxvdHxlbnwwfHwwfHw%3D&w=1000&q=80',
-  },
-  {
-    id: 4,
-    name: 'Central Station Parking',
-    address: '321 Transit Way, Central District',
-    price: '$4/hr',
-    rating: 4.0,
-    distance: '0.5 mi',
-    available: 5,
-    image:
-      'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHBhcmtpbmclMjBsb3R8ZW58MHx8MHx8&w=1000&q=80',
-  },
-];
+import { ParkingDetail, parkingData } from '~/src/libs/constants/parking/data';
+import { useQuery } from '@tanstack/react-query';
+import http from '~/src/utils/https';
+import { Typography } from '~/src/components/ui/typography';
 
 const BookingPage = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
-
   const filters = ['All', 'Nearest', 'Cheapest', 'Highest Rated', 'Most Available'];
 
-  const filteredParking = parkingData.filter(
+  const { isLoading, data: parking } = useQuery({
+    queryKey: ['parking'],
+    queryFn: () => http.get<ParkingDetail[]>(`/parking`),
+    select: (data) => data.data,
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+  });
+
+  const filteredParking = parking?.filter(
     (parking) =>
       parking.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       parking.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (isLoading) {
+    return (
+      <Container className="flex-1 items-center justify-center">
+        <Typography variant="heading">Loading...</Typography>
+      </Container>
+    );
+  }
 
   return (
     <Container className="flex-1">
@@ -110,7 +81,7 @@ const BookingPage = () => {
 
       {/* Parking List */}
       <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
-        {filteredParking.length > 0 ? (
+        {filteredParking && filteredParking.length > 0 ? (
           filteredParking.map((parking) => (
             <TouchableOpacity
               key={parking.id}

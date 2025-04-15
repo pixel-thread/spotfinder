@@ -31,7 +31,6 @@ const onSuccessLogout = async () => {
 export const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = React.useState<UserT | null>(null);
   const [isInitial, setIsInitial] = React.useState(true);
-  const router = useRouter();
   const { mutate, isPending: isAuthLoading } = useMutation({
     mutationKey: ['user'],
     mutationFn: () => http.get<UserT>(AUTH_ENDPOINT.GET_ME),
@@ -58,8 +57,9 @@ export const AuthProvider = ({ children }: Props) => {
 
   const verifyUser = async () => {
     try {
+      const token = await getToken();
       const isSkipLogin = await getSkipAuth();
-      if (isSkipLogin) {
+      if (isSkipLogin && !token) {
         logger('Skipping Auth');
         return;
       }
@@ -72,8 +72,6 @@ export const AuthProvider = ({ children }: Props) => {
         logger('Initializing Auth Completed');
         return;
       }
-
-      const token = await getToken();
 
       if (token) {
         mutate();
