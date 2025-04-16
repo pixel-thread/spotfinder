@@ -55,7 +55,7 @@ const handleResponse = <T>(response: AxiosResponse<ApiResponse<T>>): ApiResponse
 const http = {
   get: async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
     try {
-      logger({ url });
+      logger({ Method: 'GET', url });
       const response = await axiosInstance.get(url, config);
       return handleResponse<T>(response);
     } catch (error) {

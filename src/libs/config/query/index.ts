@@ -15,14 +15,10 @@ const mutationCacheOptions: MutationCache = new MutationCache({
 });
 
 export const queryClientOptions: QueryClientConfig = {
-  queryCache: queryCacheOptions,
-  mutationCache: mutationCacheOptions,
+  queryCache: new QueryCache(),
+  mutationCache: new MutationCache(),
   defaultOptions: {
-    queries: {
-      retry: false,
-    },
-    mutations: {
-      retry: false,
-    },
+    queries: { retry: false },
+    mutations: { retry: false },
   },
 };
