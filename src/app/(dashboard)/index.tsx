@@ -8,6 +8,7 @@ import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
@@ -38,12 +39,15 @@ type ParkingDetail = z.infer<typeof parkingSchema>;
 
 const HomePage = () => {
   const { user } = useAuth();
+  const page = '1';
+  const searchQuery = '';
   const { data: recentParking } = useQuery({
-    queryKey: ['parking'],
-    queryFn: () => http.get<ParkingDetail[]>(`/parking`),
+    queryKey: ['parking', page, searchQuery],
+    queryFn: () =>
+      http.get<ParkingDetail[]>(
+        PARKING_ENDPOINT.GET_SEARCH_PARKING.replace(':query', searchQuery).replace(':page', page)
+      ),
     select: (data) => data.data,
-    refetchInterval: 5000,
-    refetchIntervalInBackground: true,
   });
   return (
     <Container className="flex-1">

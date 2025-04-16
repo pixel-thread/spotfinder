@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { View, Text } from 'react-native';
+import { View, Text, ImageBackground } from 'react-native';
 
 import { Container } from '~/src/components/Container';
 import { LoginForm } from '~/src/components/page/auth/login-form';
@@ -11,15 +11,25 @@ export default function LoginPage() {
   const onPressSkip = async () => {
     return await saveSkipAuth(true);
   };
+
   return (
-    <Container className="flex-1 justify-center px-4">
-      <View className="flex w-full max-w-md flex-col gap-6 self-center">
+    <Container className="flex-1 justify-center bg-white px-4">
+      {/* Background Image */}
+      <ImageBackground
+        source={{ uri: 'https://example.com/background-image.jpg' }} // Replace with a real image URL
+        className="absolute inset-0"
+        resizeMode="cover"
+        style={{ opacity: 0.3 }}
+        imageClassName="bg-gray-200"
+      />
+
+      <View className="flex w-full max-w-md flex-col gap-6 self-center rounded-lg bg-white p-6 shadow-lg">
         {/* Header */}
         <View className="space-y-2">
-          <Typography variant="heading" className="text-center">
+          <Typography variant="heading" className="text-center text-3xl font-bold text-blue-800">
             Welcome Back
           </Typography>
-          <Typography variant="caption" className="text-center">
+          <Typography variant="caption" className="text-center text-gray-600">
             Sign in to continue to your account
           </Typography>
         </View>
@@ -28,7 +38,9 @@ export default function LoginPage() {
         <LoginForm />
 
         <View className="flex-row items-center justify-center space-x-1">
-          <Typography variant="body">or</Typography>
+          <Typography variant="body" className="text-gray-600">
+            or
+          </Typography>
         </View>
 
         {/* Footer Link */}
@@ -43,8 +55,8 @@ export default function LoginPage() {
         {/* Footer Link */}
         <View className="flex-row items-center justify-center space-x-1">
           <Link href="/" onPress={onPressSkip} asChild>
-            <Button variant="ghost" size="sm">
-              Skip
+            <Button variant="secondary" size="sm">
+              Continue without login
             </Button>
           </Link>
         </View>
