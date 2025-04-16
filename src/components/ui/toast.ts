@@ -9,11 +9,6 @@ export const toast = {
       autoHide: true,
       visibilityTime: 3000,
       topOffset: 50,
-      props: {
-        iconName: 'check-circle',
-        bgColor: '#10B981',
-        textColor: '#FFFFFF',
-      },
     });
   },
   error: (message: string) => {

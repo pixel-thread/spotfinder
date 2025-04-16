@@ -14,7 +14,7 @@
       "typedRoutes": true,
       "tsconfigPaths": true
     },
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -41,6 +41,6 @@
         "projectId": "8c409e50-e7ef-490b-9cad-0ff9486633e1"
       }
     },
-    "owner": "Jyrwa-ParkingEase"
+    "owner": "jyrwa-parkingease"
   }
 }

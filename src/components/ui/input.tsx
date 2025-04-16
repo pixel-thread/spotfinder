@@ -9,10 +9,11 @@ type InputProps = TextInputProps & {
   label?: string;
   error?: string;
   required?: boolean;
+  className?: string;
 };
 
 export const Input = React.forwardRef<TextInput, InputProps>(
-  ({ label, error, required, ...props }, ref) => {
+  ({ label, error, required, className, ...props }, ref) => {
     return (
       <View className="mb-4">
         {label && (
@@ -27,7 +28,10 @@ export const Input = React.forwardRef<TextInput, InputProps>(
         )}
         <TextInput
           ref={ref}
-          className={`rounded-lg border p-3 ${error ? 'border-red-500' : 'border-gray-300'}`}
+          className={cn(
+            className,
+            `rounded-lg border p-3 ${error ? 'border-red-500' : 'border-gray-300'}`
+          )}
           {...props}
         />
         {error && (

@@ -10,10 +10,9 @@ import { AUTH_ENDPOINT } from '~/src/libs/endpoints/auth';
 import { AuthContextI, UserT } from '~/src/types/auth/context';
 import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
+import { getSkipAuth } from '~/src/utils/storage/auth/skipAuth';
 import { getToken } from '~/src/utils/storage/token';
 import { getUserFromStorage, removeUser, saveUser } from '~/src/utils/storage/user';
-import { getSkipAuth } from '~/src/utils/storage/auth/skipAuth';
-import { useRouter } from 'expo-router';
 
 type Props = {
   children: Readonly<React.ReactNode>;
@@ -111,22 +110,19 @@ export const AuthProvider = ({ children }: Props) => {
     };
 
     initializeAuth();
-  }, [isInitial, mutate]);
+  }, [isInitial, mutate, verifyUser]);
 
+  const isLoading = isAuthLoading || isLogoutPending;
   const value: AuthContextI = {
     user,
     onLogout,
-    isAuthLoading: isAuthLoading || isLogoutPending,
+    isAuthLoading: isLoading,
     refresh: verifyUser,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      <Ternary
-        condition={isInitial || isAuthLoading}
-        trueComponent={<SplashScreen />}
-        falseComponent={children}
-      />
+      <Ternary condition={isLoading} trueComponent={<SplashScreen />} falseComponent={children} />
     </AuthContext.Provider>
   );
 };
