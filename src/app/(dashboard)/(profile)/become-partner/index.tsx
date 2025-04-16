@@ -7,37 +7,44 @@ import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { TextArea } from '~/src/components/ui/textarea';
-
+import { toast } from '~/src/components/ui/toast';
+import { useMutation } from '@tanstack/react-query';
+import http from '~/src/utils/https';
+import { PARTNER_ENDPOINT } from '~/src/libs/endpoints/partner';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { partnerRequestSchema } from '~/src/utils/validation/partner/requestPartner';
+import { useAuth } from '~/src/hooks/auth/useAuth';
+type FormValues = {
+  userId: string;
+  description: string;
+};
 export default function BecomePartnerPage() {
+  const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
 
-  const handleSubmit = async () => {
-    if (!description.trim()) {
-      Alert.alert('Error', 'Please provide a description for your request');
-      return;
-    }
+  const form = useForm<FormValues>({
+    resolver: zodResolver(partnerRequestSchema),
+    defaultValues: {
+      userId: user?.id,
+      description: '',
+    },
+  });
+  const { mutate, isPending } = useMutation({
+    mutationKey: ['partner-requests'],
+    mutationFn: async (data: FormValues) =>
+      http.post(PARTNER_ENDPOINT.POST_REQUEST_PARTNER_SHIP, data),
+    onSuccess: (data) => {
+      if (data?.success) {
+        toast.success(data.message);
+        return data.data;
+      }
+      toast.error(data.message);
+    },
+  });
 
-    setIsSubmitting(true);
-    try {
-      // Here you would make an API call to submit the partner request
-      // const response = await api.post('/partner-requests', { description });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      Alert.alert(
-        'Request Submitted',
-        'Your partner request has been submitted successfully. We will review it shortly.',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
-    } catch (error) {
-      Alert.alert('Error', 'Failed to submit your request. Please try again later.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const onSubmit: SubmitHandler<FormValues> = async (data) => mutate(data);
 
   return (
     <Container className="flex-1">
@@ -68,7 +75,7 @@ export default function BecomePartnerPage() {
               ].map((item, index) => (
                 <View key={index} className="flex-row items-center">
                   <View className="mr-3 rounded-full bg-blue-200 p-2">
-                    <Ionicons name={item.icon} size={18} color="#3b82f6" />
+                    <Ionicons name={item.icon as any} size={18} color="#3b82f6" />
                   </View>
                   <Typography className="flex-1 text-gray-700">{item.text}</Typography>
                 </View>
@@ -83,6 +90,7 @@ export default function BecomePartnerPage() {
             </Typography>
 
             <TextArea
+              {...form.register('description')}
               value={description}
               onChangeText={setDescription}
               placeholder="Describe your parking space, location, availability, and why you want to become a partner..."
@@ -121,7 +129,7 @@ export default function BecomePartnerPage() {
           <Button
             className="w-full bg-blue-600"
             size="lg"
-            onPress={handleSubmit}
+            onPress={form.handleSubmit(onSubmit)}
             disabled={isSubmitting}>
             {isSubmitting ? 'Submitting...' : 'Submit Partner Application'}
           </Button>
