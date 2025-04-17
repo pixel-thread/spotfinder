@@ -54,7 +54,7 @@ export default function LoginPage() {
         </View>
         {/* Footer Link */}
         <View className="flex-row items-center justify-center space-x-1">
-          <Link href="/" onPress={onPressSkip} asChild>
+          <Link href="/" replace onPress={onPressSkip} asChild>
             <Button variant="secondary" size="sm">
               Continue without login
             </Button>

@@ -21,13 +21,13 @@ export const AuthGuard = ({ children }: Props) => {
 
       if (skipAuth) {
         // If auth is skipped, redirect to home page
-        router.push('/');
+        router.replace('/');
         return;
       }
 
       // Continue with normal auth flow if not skipped
       if (!isAuthLoading && !user) {
-        router.push('/auth');
+        router.replace('/auth');
       }
     };
 
@@ -36,7 +36,7 @@ export const AuthGuard = ({ children }: Props) => {
 
   useEffect(() => {
     if (publicPaths.includes(pathname) && user && !isAuthLoading) {
-      router.push('/');
+      router.replace('/');
     }
   }, [pathname, user, isAuthLoading]);
 

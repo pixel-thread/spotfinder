@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 export default function DashboardLayout() {
   return (
     <Tabs
+      safeAreaInsets={{ bottom: 0 }}
       screenOptions={{
         headerShown: false,
       }}>
@@ -16,7 +17,7 @@ export default function DashboardLayout() {
         }}
       />
       <Tabs.Screen
-        name="booking"
+        name="parking"
         options={{
           title: 'Bookings',
           tabBarIcon: ({ color, size }) => <Ionicons name="car" color={color} size={size} />,
@@ -25,22 +26,6 @@ export default function DashboardLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={24} />,
-        }}
-      />
-      <Tabs.Screen
-        name="(parking)"
-        options={{
-          href: null,
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={24} />,
-        }}
-      />
-      <Tabs.Screen
-        name="(profile)"
-        options={{
-          href: null,
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={24} />,
         }}

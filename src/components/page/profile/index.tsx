@@ -37,7 +37,7 @@ const profileSections: ProfileSection[] = [
   {
     title: 'Partnership',
     items: [
-      { icon: 'help-circle-outline', label: 'Become a Partner', route: '/become-partner' },
+      { icon: 'help-circle-outline', label: 'Become a Partner', route: '/profile/become-partner' },
       { icon: 'settings-outline', label: 'Parking Lot', route: '/profile/settings' },
     ],
   },
@@ -101,7 +101,7 @@ const AuthProfile = () => {
               </Typography>
 
               {section.items.map((item, itemIdx) => (
-                <Link key={itemIdx} href={item.route} asChild>
+                <Link push={true} key={itemIdx} href={item.route} asChild>
                   <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-3 last:border-b-0">
                     <View className="mr-3 rounded-full bg-blue-50 p-2">
                       <Ionicons name={item.icon} size={22} color="#3b82f6" />

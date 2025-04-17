@@ -5,8 +5,13 @@ import { Container } from '~/src/components/Container';
 import { RegisterForm } from '~/src/components/page/auth/register-form';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
+import { saveSkipAuth } from '~/src/utils/storage/auth/skipAuth';
 
 export default function RegisterPage() {
+  const handleSkipAuth = async () => {
+    return await saveSkipAuth(true);
+  };
+
   return (
     <Container className="flex-1 justify-center px-4">
       <View className="flex w-full max-w-md flex-col gap-6 self-center">
@@ -34,7 +39,7 @@ export default function RegisterPage() {
           </Link>
         </View>
         <View className="flex-row items-center justify-center space-x-1">
-          <Link href="/dashboard" asChild>
+          <Link replace href="/" onPress={handleSkipAuth} asChild>
             <Button variant="ghost" size="sm">
               Skip
             </Button>

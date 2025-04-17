@@ -18,7 +18,7 @@ export const BookingCard = ({ parking }: BookingCardProps) => {
   return (
     <TouchableOpacity
       key={parking.id}
-      onPress={() => router.push(`/${parking.id}`)}
+      onPress={() => router.push(`/parking/${parking.id}`)}
       className="mb-4 overflow-hidden rounded-lg bg-white shadow-sm">
       <Image source={{ uri: parking.image }} className="h-40 w-full" resizeMode="cover" />
       <View className="p-4">

@@ -1,16 +1,14 @@
-import { Link, Stack } from 'expo-router';
-import { Text, View, Image } from 'react-native';
+import { Link, Stack, useRouter } from 'expo-router';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 
 export default function NotFoundScreen() {
+  const router = useRouter();
   const onPress = () => {
-    // Handle button press
-    console.log('Button pressed');
+    router.back();
   };
-  // Rest of the component code
-  // ...
   return (
     <>
       <Stack.Screen options={{ title: 'Page Not Found', headerShown: false }} />
@@ -34,10 +32,6 @@ export default function NotFoundScreen() {
           <Link href="/" asChild>
             <Button className="mb-3 w-full bg-blue-600">Go to Home</Button>
           </Link>
-
-          <Button onPress={onPress} variant="outline" className="w-full">
-            Go to Dashboard
-          </Button>
         </View>
 
         {/* Footer */}
