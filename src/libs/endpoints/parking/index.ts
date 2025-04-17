@@ -29,7 +29,7 @@ type ParkingEndpointKeys =
  */
 
 export const PARKING_ENDPOINT: EndpointT<ParkingEndpointKeys> = {
-  GET_PARKING: '/parking',
+  GET_PARKING: '/parking?page=:page',
   GET_PARKING_BY_ID: '/parking/:id',
   GET_NEARBY_PARKING: '/parking/nearby',
   POST_BOOK_PARKING: '/parking/book',

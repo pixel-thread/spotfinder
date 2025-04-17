@@ -72,7 +72,9 @@ const AuthProfile = () => {
             <View className="mr-4 h-20 w-20 items-center justify-center rounded-full bg-white/20">
               {user?.profilePic ? (
                 <Image
-                  src="https://avatar.iran.liara.run/public"
+                  source={{
+                    uri: `https://avatar.iran.liara.run/public/${user?.id}`,
+                  }}
                   className="h-20 w-20 rounded-full"
                 />
               ) : (

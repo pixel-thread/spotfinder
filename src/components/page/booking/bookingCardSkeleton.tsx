@@ -2,10 +2,13 @@ import { ScrollView, View } from 'react-native';
 
 import Skeleton from '../../ui/Skeleton';
 
-export const BookingCardSkeleton = () => {
+type BookingCardSkeletonProps = {
+  value?: number;
+};
+export const BookingCardSkeleton = ({ value = 1 }: BookingCardSkeletonProps) => {
   return (
     <ScrollView className="flex-1 px-2 py-4" showsVerticalScrollIndicator={false}>
-      {[...Array(10)].map((_, i) => (
+      {[...Array(value)].map((_, i) => (
         <View key={i} className="mb-4 overflow-hidden rounded-xl bg-gray-50 shadow-sm">
           <Skeleton className="h-40 w-full overflow-hidden rounded-t-lg shadow-sm" />
           <View className="gap-2 p-4">
