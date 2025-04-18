@@ -1,4 +1,4 @@
-export type RoleT = 'ADMIN' | 'USER' | 'SUPERADMIN';
+export type RoleT = 'PARTNER' | 'USER' | 'SUPERADMIN';
 export type VehicleTypeT = 'TWO_WHEELER' | 'FOUR_WHEELER';
 export type UserStatusT = 'ACTIVE' | 'INACTIVE';
 

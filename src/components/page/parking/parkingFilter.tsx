@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Text, ScrollView, TouchableOpacity } from 'react-native';
 
 const filters = ['All', 'Nearest', 'Cheapest', 'Highest Rated', 'Most Available'];
-export const BookingFilter = () => {
+export const ParkingFilter = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="pb-2">

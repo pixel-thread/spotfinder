@@ -6,10 +6,10 @@ import { FlashList } from '@shopify/flash-list';
 import { z } from 'zod';
 
 import { Container } from '~/src/components/Container';
-import { BookingCard } from '~/src/components/page/booking/bookingCard';
-import { BookingCardSkeleton } from '~/src/components/page/booking/bookingCardSkeleton';
-import { BookingFilter } from '~/src/components/page/booking/bookingFilter';
-import { BookingSearchCard } from '~/src/components/page/booking/bookingSearchCard';
+import { ParkingCard } from '~/src/components/page/parking/parkingCard';
+import { ParkingCardSkeleton } from '~/src/components/page/parking/parkingCardSkeleton';
+import { ParkingFilter } from '~/src/components/page/parking/parkingFilter';
+import { ParkingSearchCard } from '~/src/components/page/parking/parkingSearchCard';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
@@ -67,18 +67,18 @@ const BookingPage = () => {
         {/* Search Bar */}
 
         <Text className="mb-4 text-xl font-bold text-gray-900">Find Parking</Text>
-        <BookingSearchCard
+        <ParkingSearchCard
           isLoading={isFetching}
           onPressSearch={(value) => form.setValue('search', value || '')}
         />
         {/* Filters */}
-        <BookingFilter />
+        <ParkingFilter />
       </View>
       {/* Parking List */}
       <FlashList
         data={parking}
         keyExtractor={(item) => item?.id?.toString() || item.name}
-        renderItem={({ item }) => <BookingCard parking={item} />}
+        renderItem={({ item }) => <ParkingCard parking={item} />}
         estimatedItemSize={10}
         refreshControl={<RefreshControl refreshing={false} onRefresh={() => mutate()} />}
         onEndReachedThreshold={0.5}

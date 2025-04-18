@@ -9,7 +9,7 @@ import { EndpointT } from '~/src/types/endpoints';
  * @property GET_NEARBY_PARKING - Get nearby parking locations
  * @property POST_BOOK_PARKING - Book a parking spot
  */
-type PartenerShipEndpointKeys = 'POST_REQUEST_PARTNER_SHIP';
+type PLANEndpointKeys = 'GET_PLAN' | 'POST_SUBSCRIBE' | 'POST_CHECKOUT' | 'POST_VERIFY_PAYMENT';
 
 /**
  * Parking API endpoints configuration.
@@ -23,6 +23,9 @@ type PartenerShipEndpointKeys = 'POST_REQUEST_PARTNER_SHIP';
  * ```
  */
 
-export const PARTNER_ENDPOINT: EndpointT<PartenerShipEndpointKeys> = {
-  POST_REQUEST_PARTNER_SHIP: '/partner',
+export const PLAN_ENDPOINT: EndpointT<PLANEndpointKeys> = {
+  GET_PLAN: '/plan',
+  POST_SUBSCRIBE: '/subscribe',
+  POST_CHECKOUT: '/subscribe/checkout',
+  POST_VERIFY_PAYMENT: '/subscribe/verify-payment',
 };

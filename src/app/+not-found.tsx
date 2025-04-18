@@ -5,10 +5,6 @@ import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 
 export default function NotFoundScreen() {
-  const router = useRouter();
-  const onPress = () => {
-    router.back();
-  };
   return (
     <>
       <Stack.Screen options={{ title: 'Page Not Found', headerShown: false }} />

@@ -7,12 +7,12 @@ type FieldValues = {
   search: string;
 };
 
-type BookingSearchCardProps = {
+type ParkingSearchCardProps = {
   isLoading: boolean;
   onPressSearch: (value?: string) => void;
 };
 
-export const BookingSearchCard = ({ isLoading, onPressSearch }: BookingSearchCardProps) => {
+export const ParkingSearchCard = ({ isLoading, onPressSearch }: ParkingSearchCardProps) => {
   const form = useForm<FieldValues>({
     defaultValues: {
       search: '',

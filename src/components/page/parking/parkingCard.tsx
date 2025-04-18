@@ -12,7 +12,7 @@ type BookingCardProps = {
   parking: ParkingDetail;
 };
 
-export const BookingCard = ({ parking }: BookingCardProps) => {
+export const ParkingCard = ({ parking }: BookingCardProps) => {
   const router = useRouter();
   const { user } = useAuth();
   return (
