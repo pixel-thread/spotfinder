@@ -33,7 +33,8 @@ const profileSections: ProfileSection[] = [
     title: 'Partnership',
     items: [
       { icon: 'briefcase-outline', label: 'Pricing', route: '/pricing' },
-      { icon: 'car-outline', label: 'Parking', route: '/pricing' },
+      { icon: 'car-outline', label: 'Parking', route: '/profile/partner' },
+      { icon: 'car-outline', label: 'Add Parking', route: '/profile/partner/add-parking' },
       { icon: 'settings-outline', label: 'Parking Settings', route: '/pricing' },
     ],
   },

@@ -1,100 +1,106 @@
+import { Ionicons } from '@expo/vector-icons';
+import { FlashList } from '@shopify/flash-list';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { useEffect, useState, useCallback } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { View, Text, RefreshControl } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
 import { z } from 'zod';
 
 import { Container } from '~/src/components/Container';
+import { Ternary } from '~/src/components/Ternary';
 import { ParkingCard } from '~/src/components/page/parking/parkingCard';
 import { ParkingCardSkeleton } from '~/src/components/page/parking/parkingCardSkeleton';
 import { ParkingFilter } from '~/src/components/page/parking/parkingFilter';
+import { ParkingNotFoundCard } from '~/src/components/page/parking/parkingNotFound';
 import { ParkingSearchCard } from '~/src/components/page/parking/parkingSearchCard';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
-import { Ionicons } from '@expo/vector-icons';
-
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
 const BookingPage = () => {
   const [parking, setParking] = useState<ParkingDetail[]>([]);
-  const [page, setPage] = useState<string>('1');
-
-  const form = useForm({
-    defaultValues: {
-      search: '',
-    },
-  });
-
-  const searchQuery = useWatch({ control: form.control, name: 'search' });
+  const [page, setPage] = useState<number>(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const {
-    data,
     isPending: isFetching,
+    isIdle,
     mutate,
   } = useMutation({
-    mutationKey: ['parking'],
+    mutationKey: ['parking', page],
     mutationFn: () =>
-      http.get<Required<ParkingDetail[]>>(PARKING_ENDPOINT.GET_PARKING.replace(':page', page)),
+      http.get<Required<ParkingDetail[]>>(
+        PARKING_ENDPOINT.GET_PARKING.replace(':page', page.toString())
+      ),
     onSuccess: (data) => {
       if (data.success) {
-        const parking = data?.data || [];
-        setParking((prev) => [...prev, ...parking]);
+        const parkingData = data?.data || [];
+
+        if (isLoadingMore) {
+          setParking((prev) => [...prev, ...parkingData]);
+        } else {
+          setParking(parkingData);
+        }
+
+        // Check if there's more data to load
+        setHasMore(data.meta?.hasNextPage || false);
+        setIsLoadingMore(false);
         return data;
       }
+    },
+    onError: () => {
+      setIsLoadingMore(false);
     },
   });
 
   const onPressLoadMore = useCallback(() => {
-    const meta = data?.meta;
-    if (meta?.hasNextPage) {
-      const nextPage = meta.page + 1;
-      setPage(nextPage.toString());
+    if (!isFetching && hasMore && !isLoadingMore) {
+      setIsLoadingMore(true);
+      setPage((prevPage) => prevPage + 1);
     }
-  }, [data]);
+  }, [isFetching, hasMore, isLoadingMore]);
 
-  // Fetch data when the component mounts or when the search query changes
+  const onRefresh = () => {
+    setPage(1);
+    setParking([]);
+    setIsLoadingMore(false);
+    mutate();
+  };
+
+  // Fetch data when the component mounts or when the page changes
   useEffect(() => {
     mutate();
-  }, [searchQuery, page]);
+  }, [page]);
+
+  // Initial data fetch
+  useEffect(() => {
+    onRefresh();
+  }, []);
 
   return (
     <Container className="flex-1">
-      {/* Header */}
-      <View className="mt-2 rounded-lg bg-white p-4">
-        {/* Search Bar */}
-
-        <Text className="mb-4 text-xl font-bold text-gray-900">Find Parking</Text>
-        <ParkingSearchCard
-          isLoading={isFetching}
-          onPressSearch={(value) => form.setValue('search', value || '')}
+      {parking.length === 0 && isFetching ? (
+        <ParkingCardSkeleton value={10} />
+      ) : (
+        <FlashList
+          className="mt-2"
+          data={parking}
+          keyExtractor={(item, index) => `${item.id}_${index}`}
+          renderItem={({ item }) => <ParkingCard parking={item} />}
+          estimatedItemSize={5}
+          refreshControl={<RefreshControl refreshing={isIdle} onRefresh={onRefresh} />}
+          onEndReachedThreshold={0.5}
+          onEndReached={onPressLoadMore}
+          ListEmptyComponent={<ParkingNotFoundCard />}
+          ListFooterComponent={isLoadingMore ? <ParkingCardSkeleton value={3} /> : null}
         />
-        {/* Filters */}
-        <ParkingFilter />
-      </View>
-      {/* Parking List */}
-      <FlashList
-        data={parking}
-        keyExtractor={(item) => item?.id?.toString() || item.name}
-        renderItem={({ item }) => <ParkingCard parking={item} />}
-        estimatedItemSize={10}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={() => mutate()} />}
-        onEndReachedThreshold={0.5}
-        onEndReached={onPressLoadMore}
-        ListEmptyComponent={<BookingNotFoundCard />}
-      />
+      )}
     </Container>
   );
 };
 
 export default BookingPage;
-const BookingNotFoundCard = () => {
-  return (
-    <View className="flex-1 items-center justify-center py-10">
-      <Ionicons name="car-outline" size={60} color="#d1d5db" />
-      <Text className="mt-4 text-center text-gray-500">No parking spots found.</Text>
-    </View>
-  );
-};

@@ -16,9 +16,14 @@ export const SubscriptionProvider = ({ children }: SubscriptionProviderProps) =>
   const { user } = useAuth();
 
   const { isLoading, data: plan } = useSuspenseQuery({
-    queryFn: () => http.get<PlanT>(PLAN_ENDPOINT.GET_PLAN),
-    queryKey: ['plan'],
-    select: (data) => data?.data || null,
+    queryFn: () => http.get<PlanT[]>(PLAN_ENDPOINT.GET_PLAN),
+    queryKey: ['plan', user],
+    select: (data) => {
+      if (data.data && data.success) {
+        return data.data[0];
+      }
+      return null;
+    },
   });
 
   const { isPending: isVerifyLoading, mutate: onVerifyPayment } = useMutation({

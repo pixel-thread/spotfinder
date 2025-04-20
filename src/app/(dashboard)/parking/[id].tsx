@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { View, Image, ScrollView, TouchableOpacity, Modal, Dimensions } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
+import { View, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { z } from 'zod';
+
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
-import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '~/src/hooks/auth/useAuth';
 import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
-import { z } from 'zod';
 import { parkingSchema } from '~/src/utils/validation/parking';
-import { useAuth } from '~/src/hooks/auth/useAuth';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 export default function ParkingDetailScreen() {
@@ -19,25 +20,12 @@ export default function ParkingDetailScreen() {
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const {
-    isLoading,
-    data: parking,
-    isError,
-    error,
-  } = useQuery({
+  const { isLoading, data: parking } = useQuery({
     queryKey: ['parking', parkingId],
     queryFn: () => http.get<ParkingDetail>(`/parking/${parkingId}`),
     select: (data) => data.data,
   });
 
-  if (isError) {
-    logger({ message: error.message, error });
-    return (
-      <Container className="flex-1 items-center justify-center">
-        <Typography>Error...</Typography>
-      </Container>
-    );
-  }
   if (isLoading) {
     return (
       <Container className="flex-1 items-center justify-center bg-white">
@@ -161,7 +149,7 @@ export default function ParkingDetailScreen() {
           {/* Key Info */}
           <View className="mt-6 flex-row justify-between">
             <View className="items-center rounded-lg bg-gray-50 px-4 py-3">
-              <Typography className="text-gray-500">Price</Typography>
+              <Typography className="text-gray-500">Price/hr</Typography>
               <Typography className="text-lg font-bold text-blue-600">{parking.price}</Typography>
             </View>
             <View className="items-center rounded-lg bg-gray-50 px-4 py-3">
@@ -172,7 +160,7 @@ export default function ParkingDetailScreen() {
             </View>
             <View className="items-center rounded-lg bg-gray-50 px-4 py-3">
               <Typography className="text-gray-500">Distance</Typography>
-              <Typography className="text-lg font-bold">{parking.distance}</Typography>
+              <Ionicons name="location-outline" size={18} color="#3b82f6" />
             </View>
           </View>
 

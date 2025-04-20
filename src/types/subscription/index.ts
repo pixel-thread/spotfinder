@@ -1,6 +1,7 @@
 export type PlanT = {
   id: string;
   price: number;
+  discount: number;
 };
 
 export interface SubscriptionContextI {

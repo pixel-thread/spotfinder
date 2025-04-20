@@ -1,18 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { z } from 'zod';
+
+import { Typography } from '../../ui/typography';
 
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
-type BookingCardProps = {
+type ParkingCardProps = {
   parking: ParkingDetail;
 };
 
-export const ParkingCard = ({ parking }: BookingCardProps) => {
+export const ParkingCard = ({ parking }: ParkingCardProps) => {
   const router = useRouter();
   const { user } = useAuth();
   return (
@@ -20,7 +22,7 @@ export const ParkingCard = ({ parking }: BookingCardProps) => {
       key={parking.id}
       onPress={() => router.push(`/parking/${parking.id}`)}
       className="mb-4 overflow-hidden rounded-lg bg-white shadow-sm">
-      <Image source={{ uri: parking.image }} className="h-40 w-full" resizeMode="cover" />
+      <Image source={{ uri: parking.image }} className="aspect-video w-full" resizeMode="cover" />
       <View className="p-4">
         <View className="mb-1 flex-row items-center justify-between">
           <Text className="text-lg font-bold text-gray-900">{parking.name}</Text>
@@ -41,7 +43,7 @@ export const ParkingCard = ({ parking }: BookingCardProps) => {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
             <Ionicons name="pricetag-outline" size={16} color="#3b82f6" />
-            <Text className="ml-1 font-semibold text-blue-600">{parking.price}</Text>
+            <Text className="ml-1 font-semibold text-blue-600">{parking.price} /hr</Text>
           </View>
 
           <View className="flex-row items-center">
@@ -51,7 +53,10 @@ export const ParkingCard = ({ parking }: BookingCardProps) => {
 
           <View className="flex-row items-center">
             <Ionicons name="car-outline" size={16} color="#10b981" />
-            <Text className="ml-1 text-green-600">{parking.available} spots</Text>
+            <Text className="ml-1 text-green-600">
+              {parking.slots?.filter((slot) => slot.isOccupied === false).length || 0}
+              <Typography className="text-gray-500">/{parking.slots?.length} spots</Typography>
+            </Text>
           </View>
         </View>
       </View>

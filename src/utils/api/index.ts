@@ -10,6 +10,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token = await getToken();
+    console.log(process.env.EXPO_PUBLIC_API_URL);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       return config;

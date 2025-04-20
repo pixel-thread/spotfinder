@@ -1,26 +1,37 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 
 import { Button } from '~/src/components/ui/button';
 import { useSubscription } from '~/src/hooks/subscription/useSubscription';
 import { cn } from '~/src/libs';
-
+import { logger } from '~/src/utils/logger';
+// add a calculation of discount of 25 percent of the original price
 const PlanCard = () => {
   const [selectedSlot, setSelectedSlot] = useState(5);
   const { plan, isLoading, onSubscribe } = useSubscription();
-  const basePrice = plan?.price ?? 58;
-  const { originalPrice, totalPrice } = useMemo(() => {
-    const original = basePrice * selectedSlot;
-    const discounted = Math.round(original * 0.25); // 25% of original
-    return { originalPrice: original, totalPrice: discounted };
-  }, [plan, selectedSlot]);
+  const [discountedPrice, setDiscountedPrice] = useState(0);
+  const [originalPrice, setOriginalPrice] = useState(0);
+  const DISCOUNT_RATE = plan?.discount;
+
+  useEffect(() => {
+    if (plan && selectedSlot && DISCOUNT_RATE) {
+      const original = plan.price * selectedSlot;
+      const discountPerSlot = plan.price * (DISCOUNT_RATE / 100);
+      const totalDiscount = selectedSlot * discountPerSlot;
+      const discounted = Math.round(original - totalDiscount);
+
+      setOriginalPrice(original);
+      setDiscountedPrice(discounted);
+    }
+  }, [plan, selectedSlot, DISCOUNT_RATE]);
 
   const handleCheckout = () => {
     onSubscribe({ slot: selectedSlot });
   };
 
-  if (isLoading || !plan) {
+  if (isLoading || !plan?.discount || !plan?.price) {
+    logger({ price: plan?.price, discount: plan?.discount });
     return null;
   }
 
@@ -54,11 +65,11 @@ const PlanCard = () => {
               ₹{originalPrice}
             </Text>
             <View className={cn('rounded bg-green-100 px-2 py-1')}>
-              <Text className={cn('text-xs font-medium text-green-700')}>25% OFF</Text>
+              <Text className={cn('text-xs font-medium text-green-700')}>{DISCOUNT_RATE}% OFF</Text>
             </View>
           </View>
           <Text className={cn('mt-1 text-3xl font-bold text-gray-900')}>
-            ₹{totalPrice}&nbsp;<Text className="text-xl font-normal text-gray-500">/mo</Text>
+            ₹{discountedPrice}&nbsp;<Text className="text-xl font-normal text-gray-500">/mo</Text>
           </Text>
           <Text className={cn('mt-1 text-sm text-gray-500')}>
             Then, starts at ₹{originalPrice}/month

@@ -21,7 +21,7 @@ const routeRoles: RoleRoute[] = [
   {
     url: '/profile',
     role: ['SUPERADMIN', 'USER', 'PARTNER'],
-    needAuth: true,
+    needAuth: false,
   },
   {
     url: '/',

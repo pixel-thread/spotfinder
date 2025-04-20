@@ -11,9 +11,10 @@ import { EndpointT } from '~/src/types/endpoints';
  */
 type ParkingEndpointKeys =
   | 'GET_PARKING'
+  | 'POST_ADD_PARKING'
+  | 'GET_PARKING_BY_USER_ID'
   | 'GET_PARKING_BY_ID'
-  | 'GET_NEARBY_PARKING'
-  | 'POST_BOOK_PARKING'
+  | 'PUT_PARKING_PARKING_ID'
   | 'GET_SEARCH_PARKING';
 
 /**
@@ -31,7 +32,8 @@ type ParkingEndpointKeys =
 export const PARKING_ENDPOINT: EndpointT<ParkingEndpointKeys> = {
   GET_PARKING: '/parking?page=:page',
   GET_PARKING_BY_ID: '/parking/:id',
-  GET_NEARBY_PARKING: '/parking/nearby',
-  POST_BOOK_PARKING: '/parking/book',
+  GET_PARKING_BY_USER_ID: '/parking/user/:userId',
   GET_SEARCH_PARKING: '/parking/search?q=:query&page=:page',
+  POST_ADD_PARKING: '/parking',
+  PUT_PARKING_PARKING_ID: '/parking/:id',
 };
