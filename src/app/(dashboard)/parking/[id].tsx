@@ -10,7 +10,6 @@ import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import http from '~/src/utils/https';
-import { logger } from '~/src/utils/logger';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
@@ -94,10 +93,9 @@ export default function ParkingDetailScreen() {
 
   return (
     <Container className="flex-1 bg-white">
-      {/* Image Modal */}
       <Modal
         visible={!!selectedImage}
-        transparent={true}
+        transparent
         animationType="fade"
         onRequestClose={closeImageModal}>
         <View className="flex-1 items-center justify-center bg-black/90">
@@ -223,7 +221,7 @@ export default function ParkingDetailScreen() {
                 <Ionicons name="car-outline" size={18} color="#6b7280" />
                 <Typography className="ml-2 text-gray-700">Total Spots</Typography>
               </View>
-              <Typography className="font-medium">{parking.totalSpots}</Typography>
+              <Typography className="font-medium">{parking.slots?.length}</Typography>
             </View>
           </View>
         </View>

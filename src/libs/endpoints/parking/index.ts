@@ -13,6 +13,7 @@ type ParkingEndpointKeys =
   | 'GET_PARKING'
   | 'POST_ADD_PARKING'
   | 'GET_PARKING_BY_USER_ID'
+  | 'POST_PARKING_UPDATE_RATING'
   | 'GET_RANDOM_PARKING'
   | 'GET_PARKING_BY_ID'
   | 'PUT_PARKING_PARKING_ID'
@@ -32,6 +33,7 @@ type ParkingEndpointKeys =
 
 export const PARKING_ENDPOINT: EndpointT<ParkingEndpointKeys> = {
   GET_PARKING: '/parking?page=:page',
+  POST_PARKING_UPDATE_RATING: '/parking/:id/rating',
   GET_RANDOM_PARKING: '/parking/random?page=:page&limit=:limit',
   GET_PARKING_BY_ID: '/parking/:id',
   GET_PARKING_BY_USER_ID: '/parking/user/:userId',
