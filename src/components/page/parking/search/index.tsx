@@ -1,19 +1,20 @@
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'expo-router/build/hooks';
 import { useEffect, useState } from 'react';
 import { View, FlatList } from 'react-native';
+import { z } from 'zod';
+
+import { ParkingCard } from '../parkingCard';
+import { ParkingCardSkeleton } from '../parkingCardSkeleton';
+import { ParkingFilter } from '../parkingFilter';
+import { ParkingNotFoundCard } from '../parkingNotFound';
 
 import { Container } from '~/src/components/Container';
-import { useQuery } from '@tanstack/react-query';
-import http from '~/src/utils/https';
-import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
-import useDebounce from '~/src/hooks/useDebounce';
-import { ParkingCard } from '../parkingCard';
-import { ParkingNotFoundCard } from '../parkingNotFound';
-import { parkingSchema } from '~/src/utils/validation/parking';
-import { z } from 'zod';
 import { Ternary } from '~/src/components/Ternary';
-import { ParkingCardSkeleton } from '../parkingCardSkeleton';
-import { useSearchParams } from 'expo-router/build/hooks';
-import { ParkingFilter } from '../parkingFilter';
+import useDebounce from '~/src/hooks/useDebounce';
+import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
+import http from '~/src/utils/https';
+import { parkingSchema } from '~/src/utils/validation/parking';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 const SearchParking = () => {
@@ -40,11 +41,9 @@ const SearchParking = () => {
   return (
     <Container className="flex-1 bg-gray-50">
       <View className="mt-2 rounded-lg bg-white p-4">
-        {/* Filters */}
         <ParkingFilter />
       </View>
 
-      {/* Results List */}
       <Ternary
         condition={isFetching}
         trueComponent={<ParkingCardSkeleton value={10} />}

@@ -1,19 +1,13 @@
-import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
 import { useEffect, useState, useCallback } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
-import { View, Text, RefreshControl } from 'react-native';
+import { RefreshControl } from 'react-native';
 import { z } from 'zod';
 
 import { Container } from '~/src/components/Container';
-import { Ternary } from '~/src/components/Ternary';
 import { ParkingCard } from '~/src/components/page/parking/parkingCard';
 import { ParkingCardSkeleton } from '~/src/components/page/parking/parkingCardSkeleton';
-import { ParkingFilter } from '~/src/components/page/parking/parkingFilter';
 import { ParkingNotFoundCard } from '~/src/components/page/parking/parkingNotFound';
-import { ParkingSearchCard } from '~/src/components/page/parking/parkingSearchCard';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
@@ -34,7 +28,10 @@ const BookingPage = () => {
     mutationKey: ['parking', page],
     mutationFn: () =>
       http.get<Required<ParkingDetail[]>>(
-        PARKING_ENDPOINT.GET_PARKING.replace(':page', page.toString())
+        PARKING_ENDPOINT.GET_RANDOM_PARKING.replace(':page', page.toString()).replace(
+          ':limit',
+          '10'
+        )
       ),
     onSuccess: (data) => {
       if (data.success) {
