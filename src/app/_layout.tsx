@@ -6,7 +6,6 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import './global.css';
 
 import { MainProviders } from '~/src/components/providers';
-import { NavigationContainer } from '@react-navigation/native';
 
 export default function RootLayout() {
   return (
@@ -15,7 +14,8 @@ export default function RootLayout() {
         <StatusBar barStyle="dark-content" className="bg-transparent" />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={80}>
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
           <Suspense>
             <MainProviders>
               <Slot />
