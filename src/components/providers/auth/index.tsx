@@ -30,16 +30,19 @@ const onSuccessLogout = async () => {
 export const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = React.useState<UserT | null>(null);
   const [isInitial, setIsInitial] = React.useState(true);
+
   const { mutate, isPending: isAuthLoading } = useMutation({
     mutationKey: ['user'],
     mutationFn: () => http.get<UserT>(AUTH_ENDPOINT.GET_ME),
     onSuccess: async (data) => {
+      logger.info({ isUserSuccessFetch: data.success, data: data.data });
       if (data.success) {
-        const userData = data?.data;
+        logger.log({ data: data.data });
+        const userData = data.data;
         setUser(userData);
         if (userData) {
-          await saveUser(userData);
           logger.info('Saving User To Storage after fetching');
+          await saveUser(userData);
           logger.info('Initializing Auth Completed');
           return userData;
         }

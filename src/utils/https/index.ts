@@ -15,7 +15,6 @@ export interface ApiResponse<T> {
 }
 
 export const handleAxiosError = <T>(error: unknown): ApiResponse<T> => {
-  logger.error(error);
   let errorMessage = 'Something went wrong. Please try again.';
   let errorDetails: string | Record<string, unknown> = '';
 

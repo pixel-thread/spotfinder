@@ -5,6 +5,10 @@ import { getToken } from '../storage/token';
 const axiosInstance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL as string,
   timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 });
 
 axiosInstance.interceptors.request.use(
