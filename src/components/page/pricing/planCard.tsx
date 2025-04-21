@@ -1,13 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 
+import { PlanCardSkeleton } from './planCardSkeleton';
+
 import { Button } from '~/src/components/ui/button';
+import { useAuth } from '~/src/hooks/auth/useAuth';
 import { useSubscription } from '~/src/hooks/subscription/useSubscription';
 import { cn } from '~/src/libs';
-import { logger } from '~/src/utils/logger';
+
 // add a calculation of discount of 25 percent of the original price
 const PlanCard = () => {
+  const { user } = useAuth();
   const [selectedSlot, setSelectedSlot] = useState(5);
   const { plan, isLoading, onSubscribe } = useSubscription();
   const [discountedPrice, setDiscountedPrice] = useState(0);
@@ -30,9 +34,9 @@ const PlanCard = () => {
     onSubscribe({ slot: selectedSlot });
   };
 
-  if (isLoading || !plan?.discount || !plan?.price) {
-    logger({ price: plan?.price, discount: plan?.discount });
-    return null;
+  // Show skeleton if loading or essential data is missing
+  if (isLoading || !user || !plan?.discount || !plan?.price) {
+    return <PlanCardSkeleton />;
   }
 
   return (
