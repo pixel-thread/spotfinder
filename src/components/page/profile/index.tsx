@@ -78,7 +78,7 @@ const profileSectionsWithOutAuth: ProfileSection[] = [
 ];
 
 const AuthProfile = () => {
-  const { user, onLogout } = useAuth();
+  const { user, onLogout, refresh } = useAuth();
   const router = useRouter();
 
   const onPressLogout = () => {
@@ -88,6 +88,7 @@ const AuthProfile = () => {
     }
     router.replace('/auth');
   };
+
   return (
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>

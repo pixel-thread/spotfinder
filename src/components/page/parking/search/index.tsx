@@ -40,10 +40,6 @@ const SearchParking = () => {
 
   return (
     <Container className="flex-1 bg-gray-50">
-      <View className="mt-2 rounded-lg bg-white p-4">
-        <ParkingFilter />
-      </View>
-
       <Ternary
         condition={isFetching}
         trueComponent={<ParkingCardSkeleton value={10} />}

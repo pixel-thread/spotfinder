@@ -37,16 +37,16 @@ export const LoginForm = () => {
     mutationFn: (data: FormValue) => http.post<LoginUser>(AUTH_ENDPOINT.POST_LOGIN, data),
     onSuccess: async (data) => {
       if (data.success) {
-        logger<string>('Login Successfull');
+        logger.log<string>('Login Successfull');
         if (data.token) {
           await saveToken(data.token);
-          logger<string>('Token Set Successfully');
+          logger.log<string>('Token Set Successfully');
           refresh();
           return data.data;
         }
       }
       toast.error(data.message);
-      logger({ message: data.message, error: data?.error });
+      logger.warn({ message: data.message, error: data?.error });
       return data.data;
     },
   });

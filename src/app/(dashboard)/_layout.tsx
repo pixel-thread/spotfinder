@@ -9,7 +9,7 @@ export default function DashboardLayout() {
         headerShown: false,
         tabBarHideOnKeyboard: false,
         tabBarPosition: 'bottom',
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
       }}>
       <Tabs.Screen
         name="index"
@@ -21,6 +21,7 @@ export default function DashboardLayout() {
       <Tabs.Screen
         name="parking"
         options={{
+          href: '/parking',
           title: 'Bookings',
           tabBarIcon: ({ color, size }) => <Ionicons name="car" color={color} size={size} />,
         }}

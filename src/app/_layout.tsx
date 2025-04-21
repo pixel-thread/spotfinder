@@ -1,4 +1,4 @@
-import { Slot } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { Suspense } from 'react';
 import { KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
@@ -22,7 +22,9 @@ export default function RootLayout() {
           keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
           <Suspense>
             <MainProviders>
-              <Slot />
+              <Stack
+                screenOptions={{ headerShown: false, headerBackButtonDisplayMode: 'generic' }}
+              />
             </MainProviders>
           </Suspense>
         </KeyboardAvoidingView>

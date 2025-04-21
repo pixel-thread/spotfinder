@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View, TextInput, TouchableOpacity } from 'react-native';
+import { ParkingFilter } from '~/src/components/page/parking/parkingFilter';
 
 export default function ParkingLayout() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,22 +30,14 @@ export default function ParkingLayout() {
       screenOptions={{
         headerShown: true,
         title: '',
+        headerBackButtonDisplayMode: 'generic',
         headerTitle: () => (
-          <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: '#f3f4f6',
-                borderRadius: 8,
-                paddingHorizontal: 8,
-                height: 36,
-              }}>
+          <View className="w-full flex-col items-center gap-3 py-2">
+            <View className="h-12 flex-1 flex-row items-center rounded-lg bg-gray-100 px-2">
               <Ionicons name="search" size={16} color="#6b7280" />
               <TextInput
                 placeholder="Search parking..."
-                style={{ flex: 1, marginLeft: 8, fontSize: 14 }}
+                className="ml-2 flex-1 text-sm"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onSubmitEditing={handleSearch}
@@ -56,6 +49,7 @@ export default function ParkingLayout() {
                 </TouchableOpacity>
               )}
             </View>
+            <ParkingFilter />
           </View>
         ),
       }}
