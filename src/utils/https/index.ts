@@ -15,7 +15,7 @@ export interface ApiResponse<T> {
 }
 
 export const handleAxiosError = <T>(error: unknown): ApiResponse<T> => {
-  logger(error);
+  logger.error(error);
   let errorMessage = 'Something went wrong. Please try again.';
   let errorDetails: string | Record<string, unknown> = '';
 
@@ -52,10 +52,11 @@ const handleResponse = <T>(response: AxiosResponse<ApiResponse<T>>): ApiResponse
     token: response.data.token,
   };
 };
+
 const http = {
   get: async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
     try {
-      logger({ method: 'GET =>', path: url });
+      logger.log({ method: 'GET =>', path: url });
       const response = await axiosInstance.get(url, config);
       return handleResponse<T>(response);
     } catch (error) {
@@ -69,7 +70,7 @@ const http = {
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> => {
     try {
-      logger({ method: 'POST =>', path: url });
+      logger.log({ method: 'POST =>', path: url });
       const response = await axiosInstance.post(url, data, config);
       return handleResponse<T>(response);
     } catch (error) {
@@ -83,6 +84,7 @@ const http = {
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> => {
     try {
+      logger.log({ method: 'PUT =>', path: url });
       const response = await axiosInstance.put(url, data, config);
       return handleResponse<T>(response);
     } catch (error) {
@@ -92,6 +94,7 @@ const http = {
 
   delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
     try {
+      logger.log({ method: 'DELETE =>', path: url });
       const response = await axiosInstance.delete(url, config);
       return handleResponse<T>(response);
     } catch (error) {

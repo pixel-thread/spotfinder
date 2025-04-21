@@ -7,6 +7,7 @@ import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { Ternary } from '../../Ternary';
+import { logger } from '~/src/utils/logger';
 
 type ProfileItems = {
   icon: string;
@@ -87,7 +88,6 @@ const AuthProfile = () => {
     }
     router.replace('/auth');
   };
-
   return (
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -107,8 +107,10 @@ const AuthProfile = () => {
               <Typography className="text-xl font-bold text-white">
                 {user?.name || 'Guest User'}
               </Typography>
-              <Typography className="text-white/80">{user?.email || 'Not signed in'}</Typography>
-              <Typography className="text-white/80">{user?.phone || ''}</Typography>
+              <Typography className="text-white/80">
+                {user?.auth.email || 'Not signed in'}
+              </Typography>
+              <Typography className="text-white/80">{user?.auth.phone || ''}</Typography>
             </View>
           </View>
         </View>

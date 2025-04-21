@@ -22,7 +22,7 @@ const onSuccessLogout = async () => {
   try {
     await removeUser();
   } catch (error) {
-    logger({ message: 'Failed to logout', error });
+    logger.error({ message: 'Failed to logout', error });
     toast.error('Failed to logout');
   }
 };
@@ -39,17 +39,17 @@ export const AuthProvider = ({ children }: Props) => {
         setUser(userData);
         if (userData) {
           await saveUser(userData);
-          logger('Saving User To Storage after fetching');
-          logger('Initializing Auth Completed');
+          logger.info('Saving User To Storage after fetching');
+          logger.info('Initializing Auth Completed');
           return userData;
         }
       }
-      logger('User failed to verify');
+      logger.error('User failed to verify');
       setUser(null);
     },
     onError: (error) => {
       setUser(null);
-      logger({ message: 'Fetching user failed', error });
+      logger.error({ message: 'Fetching user failed', error });
       toast.error('Failed to fetch user');
     },
   });
@@ -59,29 +59,29 @@ export const AuthProvider = ({ children }: Props) => {
       const token = await getToken();
       const isSkipLogin = await getSkipAuth();
       if (isSkipLogin && !token) {
-        logger('Skipping Auth');
+        logger.info('Skipping Auth');
         return;
       }
       const userFromStorage = await getUserFromStorage();
 
       if (userFromStorage) {
-        logger('Setting User From Storage');
+        logger.info('Setting User From Storage');
         setUser(userFromStorage);
-        logger('User Set From Storage');
-        logger('Initializing Auth Completed');
+        logger.info('User Set From Storage');
+        logger.info('Initializing Auth Completed');
         return;
       }
 
       if (token) {
         mutate();
-        logger('Getting User From Token');
+        logger.info('Getting User From Token');
       } else {
         setUser(null);
-        logger<string>('No token or user found in storage');
+        logger.info('No token or user found in storage');
       }
     } catch (error) {
       setUser(null);
-      logger({ message: 'Error verifying user', error });
+      logger.error({ message: 'Error verifying user', error });
     } finally {
       setIsInitial(false);
     }
@@ -92,11 +92,11 @@ export const AuthProvider = ({ children }: Props) => {
     onSuccess: async () => {
       onSuccessLogout();
       setUser(null);
-      logger('Logout Successfull');
+      logger.info('Logout Successfull');
     },
     onError: (error) => {
       setUser(null);
-      logger({ message: 'Failed to logout but still logged locally', error });
+      logger.error({ message: 'Failed to logout but still logged locally', error });
       toast.error('Failed to logout');
     },
   });
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const initializeAuth = async () => {
       if (isInitial) {
-        logger('Initializing Auth');
+        logger.info('Initializing Auth');
         await verifyUser();
       }
     };

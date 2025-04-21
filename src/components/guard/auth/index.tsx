@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'expo-router';
-import { useAuth } from '~/src/hooks/auth/useAuth';
+import React, { useEffect, useMemo } from 'react';
+
 import { SplashScreen } from '../../SplashScreen';
+
+import { useAuth } from '~/src/hooks/auth/useAuth';
 import { RoleT } from '~/src/types/auth/context';
 import { logger } from '~/src/utils/logger';
 
@@ -51,13 +53,6 @@ export const AuthGuard = ({ children }: Props) => {
 
   // Route access control
   useEffect(() => {
-    // const route = routeRoles.find((route) => route.url === pathname);
-    // logger({
-    //   pathName: pathname,
-    //   isAuthenticated,
-    //   role: userRole,
-    //   route: route,
-    // });
     if (isAuthLoading) return;
     const currentRoute = routeRoles.find((route) => {
       if (route.url === pathname) return true;
@@ -81,10 +76,9 @@ export const AuthGuard = ({ children }: Props) => {
       // Role check for authenticated user
       if (isAuthenticated) {
         const hasRole = currentRoute.role.includes(userRole);
-        logger({ 'Has Needed Role': hasRole });
+        logger.info({ 'Has Needed Role': hasRole });
         if (!hasRole) {
           router.replace('/');
-          return;
         }
       }
     }
