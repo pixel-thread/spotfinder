@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
@@ -9,13 +9,14 @@ import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 export default function ParkingDetailScreen() {
   const { user } = useAuth();
-  const { id: parkingId } = useLocalSearchParams();
+  const { id: parkingId } = useLocalSearchParams() || '';
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -23,6 +24,29 @@ export default function ParkingDetailScreen() {
     queryKey: ['parking', parkingId],
     queryFn: () => http.get<ParkingDetail>(`/parking/${parkingId}`),
     select: (data) => data.data,
+  });
+
+  const {
+    data: rating,
+    isLoading: isRatingLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['parking', 'rating', parkingId],
+    queryFn: () =>
+      http.get<ParkingDetail['rating']>(
+        PARKING_ENDPOINT.PUT_PARKING_UPDATE_RATING.replace(':id', parkingId.toString() || '')
+      ),
+    select: (data) => data?.data,
+  });
+  const { mutate: rateParking } = useMutation({
+    mutationKey: ['parking', 'rating', parkingId],
+    mutationFn: () =>
+      http.put(PARKING_ENDPOINT.PUT_PARKING_UPDATE_RATING.replace(':id', parking?.id || ''), {}),
+    onSuccess: (data) => {
+      if (data.success) {
+        refetch();
+      }
+    },
   });
 
   if (isLoading) {
@@ -129,12 +153,16 @@ export default function ParkingDetailScreen() {
               {parking.name}
             </Typography>
             <View className="flex-row items-center rounded-lg bg-blue-50 px-2 py-1">
-              <Ionicons
-                name={user && parking.rating?.includes(user?.id) ? 'star' : 'star-outline'}
-                size={16}
-                color="#f59e0b"
-              />
-              <Typography className="ml-1 font-medium">{parking.rating?.length}</Typography>
+              <TouchableOpacity
+                disabled={isRatingLoading || isLoading}
+                onPress={() => rateParking()}>
+                <Ionicons
+                  name={user && rating?.includes(user?.id) ? 'star' : 'star-outline'}
+                  size={16}
+                  color="#f59e0b"
+                />
+              </TouchableOpacity>
+              <Typography className="ml-1 font-medium">{rating?.length}</Typography>
             </View>
           </View>
 
