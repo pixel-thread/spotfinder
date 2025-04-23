@@ -53,7 +53,7 @@ export const Security = () => {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="p-4">
         <View className="mb-6 flex-row items-center">
           <Typography variant="heading" className="text-xl font-bold">
@@ -62,7 +62,7 @@ export const Security = () => {
         </View>
 
         {/* Last Login Info */}
-        <View className="mb-6 rounded-lg bg-blue-50 p-4">
+        <View className="mb-6 rounded-lg border border-gray-200 bg-blue-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
           <View className="flex-row items-center">
             <Ionicons name="time-outline" size={20} color="#3b82f6" />
             <Typography className="ml-2 font-medium">Last Login</Typography>
@@ -73,8 +73,8 @@ export const Security = () => {
         </View>
 
         {/* Password Section */}
-        <View className="mb-6 rounded-lg border border-gray-200">
-          <View className="border-b border-gray-200 p-4">
+        <View className="mb-6 rounded-lg border border-gray-200 dark:border-gray-800">
+          <View className="border-b border-gray-200 p-4 dark:border-gray-800">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <Ionicons name="lock-closed-outline" size={20} color="#3b82f6" />
@@ -89,9 +89,7 @@ export const Security = () => {
               )}
             </View>
             {!isChangingPassword ? (
-              <Typography className="mt-1 text-sm text-gray-600">
-                Last changed 30 days ago
-              </Typography>
+              <Typography className="mt-1 text-sm">Last changed 30 days ago</Typography>
             ) : (
               <View className="mt-4 space-y-4">
                 {/* Current Password */}
@@ -99,7 +97,7 @@ export const Security = () => {
                   <Typography className="mb-1 text-sm text-gray-500">Current Password</Typography>
                   <View className="flex-row items-center">
                     <TextInput
-                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base"
+                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
                       value={passwordForm.currentPassword}
                       onChangeText={(value) => handlePasswordChange('currentPassword', value)}
                       placeholder="Enter current password"
@@ -122,7 +120,7 @@ export const Security = () => {
                   <Typography className="mb-1 text-sm text-gray-500">New Password</Typography>
                   <View className="flex-row items-center">
                     <TextInput
-                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base"
+                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
                       value={passwordForm.newPassword}
                       onChangeText={(value) => handlePasswordChange('newPassword', value)}
                       placeholder="Enter new password"
@@ -142,10 +140,10 @@ export const Security = () => {
 
                 {/* Confirm Password */}
                 <View className="relative">
-                  <Typography className="mb-1 text-sm text-gray-500">Confirm Password</Typography>
+                  <Typography className="mb-1 text-sm">Confirm Password</Typography>
                   <View className="flex-row items-center">
                     <TextInput
-                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base"
+                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
                       value={passwordForm.confirmPassword}
                       onChangeText={(value) => handlePasswordChange('confirmPassword', value)}
                       placeholder="Confirm new password"
@@ -164,9 +162,9 @@ export const Security = () => {
                 </View>
 
                 {/* Action Buttons */}
-                <View className="mt-2 flex-row space-x-4">
+                <View className="mt-2 flex-row gap-4">
                   <Button
-                    className="flex-1 bg-gray-200"
+                    className="flex-1 bg-gray-200 "
                     onPress={() => setIsChangingPassword(false)}>
                     Cancel
                   </Button>
@@ -179,7 +177,7 @@ export const Security = () => {
           </View>
 
           {/* Two-Factor Authentication */}
-          <View className="border-b border-gray-200 p-4">
+          <View className="border-b border-gray-200 p-4 dark:border-gray-800">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <Ionicons name="shield-checkmark-outline" size={20} color="#3b82f6" />
@@ -192,7 +190,7 @@ export const Security = () => {
                 thumbColor={twoFactorEnabled ? '#3b82f6' : '#f4f4f5'}
               />
             </View>
-            <Typography className="mt-1 text-sm text-gray-600">
+            <Typography className="mt-1 text-sm">
               Add an extra layer of security to your account
             </Typography>
           </View>
@@ -224,7 +222,7 @@ export const Security = () => {
           </Typography>
 
           <TouchableOpacity
-            className="flex-row items-center justify-between rounded-lg border border-gray-200 p-4"
+            className="flex-row items-center justify-between rounded-lg border border-gray-200 p-4 dark:border-gray-800"
             onPress={() => router.push('/account')}>
             <View className="flex-row items-center">
               <Ionicons name="phone-portrait-outline" size={20} color="#3b82f6" />
@@ -235,7 +233,7 @@ export const Security = () => {
         </View>
 
         {/* Security Tips */}
-        <View className="rounded-lg bg-gray-50 p-4">
+        <View className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
           <View className="mb-2 flex-row items-center">
             <Ionicons name="information-circle-outline" size={20} color="#3b82f6" />
             <Typography className="ml-2 font-medium">Security Tips</Typography>

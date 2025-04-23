@@ -58,7 +58,7 @@ export const PaymentMethods = () => {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="p-4">
         {/* Header */}
         <View className="mb-6 flex-row items-center">
@@ -73,7 +73,9 @@ export const PaymentMethods = () => {
             <View
               key={method.id}
               className={`mb-3 rounded-lg border ${
-                method.isDefault ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                method.isDefault
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30'
+                  : 'border-gray-200 dark:border-gray-800'
               } p-4`}>
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
@@ -92,8 +94,8 @@ export const PaymentMethods = () => {
                 </View>
                 <View className="flex-row items-center">
                   {method.isDefault ? (
-                    <View className="rounded-full bg-blue-100 px-3 py-1">
-                      <Typography className="text-xs text-blue-600">Default</Typography>
+                    <View className="mr-1 rounded-full bg-blue-100 px-3 py-1 dark:bg-blue-950">
+                      <Typography className="text-xs">Default</Typography>
                     </View>
                   ) : (
                     <TouchableOpacity
@@ -123,15 +125,15 @@ export const PaymentMethods = () => {
 
         {/* Accepted Payment Methods */}
         <View className="mb-6">
-          <Typography variant="caption" className="mb-3 px-2 text-gray-500">
+          <Typography variant="caption" className="mb-3 px-2">
             ACCEPTED PAYMENT METHODS
           </Typography>
-          <View className="flex-row flex-wrap items-center justify-around rounded-lg border border-gray-200 p-4">
+          <View className="flex-row flex-wrap items-center justify-around rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <View className="m-2 items-center">
               <View className="h-10 w-16 items-center justify-center">
                 <Ionicons name="card-outline" size={32} color="#6b7280" />
               </View>
-              <Typography className="mt-1 text-xs text-gray-500">Credit Card</Typography>
+              <Typography className="mt-1 text-xs">Credit Card</Typography>
             </View>
             <View className="m-2 items-center">
               <View className="h-10 w-16 items-center justify-center">
@@ -143,19 +145,19 @@ export const PaymentMethods = () => {
               <View className="h-10 w-16 items-center justify-center">
                 <Ionicons name="wallet-outline" size={32} color="#6b7280" />
               </View>
-              <Typography className="mt-1 text-xs text-gray-500">Wallet</Typography>
+              <Typography className="mt-1 text-xs">Wallet</Typography>
             </View>
             <View className="m-2 items-center">
               <View className="h-10 w-16 items-center justify-center">
                 <Ionicons name="phone-portrait-outline" size={32} color="#6b7280" />
               </View>
-              <Typography className="mt-1 text-xs text-gray-500">Net Banking</Typography>
+              <Typography className="mt-1 text-xs">Net Banking</Typography>
             </View>
           </View>
         </View>
 
         {/* Payment Security */}
-        <View className="rounded-lg bg-gray-50 p-4">
+        <View className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
           <View className="mb-2 flex-row items-center">
             <Ionicons name="shield-checkmark-outline" size={20} color="#3b82f6" />
             <Typography className="ml-2 font-medium">Secure Payments</Typography>

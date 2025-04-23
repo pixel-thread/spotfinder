@@ -34,7 +34,7 @@ export const NotificationSettings = () => {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="p-4">
         {/* Header */}
         <Typography variant="heading" className="mb-6 text-xl font-bold">
@@ -42,8 +42,8 @@ export const NotificationSettings = () => {
         </Typography>
 
         {/* Main Notification Channels */}
-        <View className="mb-6 rounded-lg border border-gray-200">
-          <View className="border-b border-gray-200 p-4">
+        <View className="mb-6 rounded-lg border border-gray-200 dark:border-gray-800">
+          <View className="border-b border-gray-200 p-4 dark:border-gray-800">
             <View className="flex-row items-center justify-between">
               <Typography className="font-medium">Push Notifications</Typography>
               <Switch
@@ -53,12 +53,10 @@ export const NotificationSettings = () => {
                 thumbColor={notifications.pushEnabled ? '#3b82f6' : '#f4f4f5'}
               />
             </View>
-            <Typography className="mt-1 text-sm text-gray-600">
-              Receive notifications on your device
-            </Typography>
+            <Typography className="mt-1 text-sm ">Receive notifications on your device</Typography>
           </View>
 
-          <View className="border-b border-gray-200 p-4">
+          <View className="border-b border-gray-200 p-4 dark:border-gray-800">
             <View className="flex-row items-center justify-between">
               <Typography className="font-medium">Email Notifications</Typography>
               <Switch
@@ -68,9 +66,7 @@ export const NotificationSettings = () => {
                 thumbColor={notifications.emailEnabled ? '#3b82f6' : '#f4f4f5'}
               />
             </View>
-            <Typography className="mt-1 text-sm text-gray-600">
-              Receive notifications via email
-            </Typography>
+            <Typography className="mt-1 text-sm ">Receive notifications via email</Typography>
           </View>
 
           <View className="p-4">
@@ -83,21 +79,19 @@ export const NotificationSettings = () => {
                 thumbColor={notifications.smsEnabled ? '#3b82f6' : '#f4f4f5'}
               />
             </View>
-            <Typography className="mt-1 text-sm text-gray-600">
-              Receive notifications via text message
-            </Typography>
+            <Typography className="mt-1 text-sm">Receive notifications via text message</Typography>
           </View>
         </View>
 
         {/* Push Notification Categories */}
         {notifications.pushEnabled && (
           <View className="mb-6">
-            <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+            <Typography variant="caption" className="mb-2 px-2">
               PUSH NOTIFICATION TYPES
             </Typography>
 
-            <View className="rounded-lg border border-gray-200">
-              <View className="border-b border-gray-200 p-4">
+            <View className="rounded-lg border border-gray-200 dark:border-gray-800">
+              <View className="border-b border-gray-200 p-4 dark:border-gray-800">
                 <View className="flex-row items-center justify-between">
                   <Typography>Booking Reminders</Typography>
                   <Switch
@@ -109,7 +103,7 @@ export const NotificationSettings = () => {
                 </View>
               </View>
 
-              <View className="border-b border-gray-200 p-4">
+              <View className="border-b border-gray-200 p-4 dark:border-gray-800">
                 <View className="flex-row items-center justify-between">
                   <Typography>Payment Alerts</Typography>
                   <Switch
@@ -121,7 +115,7 @@ export const NotificationSettings = () => {
                 </View>
               </View>
 
-              <View className="border-b border-gray-200 p-4">
+              <View className="border-b border-gray-200 p-4 dark:border-gray-800">
                 <View className="flex-row items-center justify-between">
                   <Typography>Promotional Offers</Typography>
                   <Switch
@@ -133,7 +127,7 @@ export const NotificationSettings = () => {
                 </View>
               </View>
 
-              <View className="border-b border-gray-200 p-4">
+              <View className="border-b border-gray-200 p-4 dark:border-gray-800">
                 <View className="flex-row items-center justify-between">
                   <Typography>App Updates</Typography>
                   <Switch
@@ -163,12 +157,12 @@ export const NotificationSettings = () => {
         {/* Email Notification Categories */}
         {notifications.emailEnabled && (
           <View className="mb-6">
-            <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+            <Typography variant="caption" className="mb-2 px-2">
               EMAIL NOTIFICATION TYPES
             </Typography>
 
-            <View className="rounded-lg border border-gray-200">
-              <View className="border-b border-gray-200 p-4">
+            <View className="rounded-lg border border-gray-200 dark:border-gray-800">
+              <View className="border-b border-gray-200 p-4 dark:border-gray-800">
                 <View className="flex-row items-center justify-between">
                   <Typography>Receipts & Invoices</Typography>
                   <Switch
@@ -180,7 +174,7 @@ export const NotificationSettings = () => {
                 </View>
               </View>
 
-              <View className="border-b border-gray-200 p-4">
+              <View className="border-b border-gray-200 p-4 dark:border-gray-800">
                 <View className="flex-row items-center justify-between">
                   <Typography>Promotional Emails</Typography>
                   <Switch
@@ -209,11 +203,11 @@ export const NotificationSettings = () => {
 
         {/* Do Not Disturb */}
         <View className="mb-6">
-          <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+          <Typography variant="caption" className="mb-2 px-2">
             TIME PREFERENCES
           </Typography>
 
-          <View className="rounded-lg border border-gray-200 p-4">
+          <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <View className="flex-row items-center justify-between">
               <View>
                 <Typography className="font-medium">Do Not Disturb</Typography>
@@ -232,7 +226,7 @@ export const NotificationSettings = () => {
         </View>
 
         {/* Privacy Note */}
-        <View className="rounded-lg bg-gray-50 p-4">
+        <View className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
           <Typography className="font-medium">Privacy Information</Typography>
           <Typography className="mt-2 text-sm text-gray-600">
             You can change your notification preferences at any time. We respect your privacy and

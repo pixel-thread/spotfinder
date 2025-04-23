@@ -5,6 +5,7 @@ import { View, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { Button } from '../../ui/button';
 
 export const PersonalInformation = () => {
   const { user } = useAuth();
@@ -19,49 +20,47 @@ export const PersonalInformation = () => {
   });
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="p-4">
         {/* Header */}
-        <View className="mb-6 flex-row items-center">
+        <View className="mb-6 flex-row items-center justify-between">
           <Typography variant="heading" className="text-xl font-bold">
             Personal Information
           </Typography>
-          <TouchableOpacity
-            className="ml-auto rounded-full bg-blue-50 p-2"
-            onPress={() => router.push('/account/personal/edit')}>
+          <Button variant="ghost" onPress={() => router.push('/account/personal/edit')}>
             <Ionicons name="create-outline" size={20} color="#3b82f6" />
-          </TouchableOpacity>
+          </Button>
         </View>
 
         {/* Form */}
         <View className="gap-y-4">
           {/* Name */}
-          <View className="rounded-lg border border-gray-200 p-4">
+          <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <Typography className="mb-1 text-sm text-gray-500">Full Name</Typography>
             <Typography className="text-base">{formData.name || 'Not provided'}</Typography>
           </View>
 
           {/* Email */}
-          <View className="rounded-lg border border-gray-200 p-4">
+          <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <Typography className="mb-1 text-sm text-gray-500">Email Address</Typography>
             <Typography className="text-base">{formData.email || 'Not provided'}</Typography>
           </View>
 
           {/* Phone */}
-          <View className="rounded-lg border border-gray-200 p-4">
+          <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <Typography className="mb-1 text-sm text-gray-500">Phone Number</Typography>
             <Typography className="text-base">{formData.phone || 'Not provided'}</Typography>
           </View>
 
           {/* Address */}
-          <View className="rounded-lg border border-gray-200 p-4">
+          <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <Typography className="mb-1 text-sm text-gray-500">Address</Typography>
             <Typography className="text-base">{formData.address || 'Not provided'}</Typography>
           </View>
         </View>
 
         {/* Privacy Note */}
-        <View className="mt-8 rounded-lg bg-gray-100 p-4">
+        <View className="mt-8 rounded-lg bg-gray-200 p-4 dark:bg-gray-800">
           <View className="mb-2 flex-row items-center">
             <Ionicons name="shield-checkmark-outline" size={20} color="#3b82f6" />
             <Typography className="ml-2 font-medium">Privacy Information</Typography>
@@ -76,4 +75,3 @@ export const PersonalInformation = () => {
     </ScrollView>
   );
 };
-
