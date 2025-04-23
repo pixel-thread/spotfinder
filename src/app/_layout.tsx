@@ -1,19 +1,16 @@
 import { Stack } from 'expo-router';
 import { Suspense } from 'react';
-import { KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
+import { KeyboardAvoidingView, Platform, StatusBar, useColorScheme } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import './global.css';
 
 import { MainProviders } from '~/src/components/providers';
-import { useColorScheme } from 'nativewind';
 
 export default function RootLayout() {
-  const { setColorScheme } = useColorScheme();
-  setColorScheme('system');
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-950">
-        <StatusBar />
+      <SafeAreaView className="bg-white-50 flex-1 dark:bg-gray-950">
+        {/* <StatusBar className="bg-white dark:bg-gray-950" /> */}
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}

@@ -14,7 +14,7 @@ export const ProfileDetail = () => {
   const { colorScheme } = useColorScheme();
 
   return (
-    <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-950">
+    <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="items-center p-6">
         <View className="mb-4 h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
           {user?.profilePic ? (
@@ -29,26 +29,24 @@ export const ProfileDetail = () => {
             </View>
           )}
         </View>
-        <Typography variant="heading" className="text-xl font-bold text-gray-900 dark:text-gray-50">
+        <Typography variant="heading" className="text-xl font-bold">
           {user?.name || 'Guest User'}
         </Typography>
-        <Typography className="text-gray-500 dark:text-gray-400">
-          {user?.auth.email || 'guest@example.com'}
-        </Typography>
+        <Typography>{user?.auth.email || 'guest@example.com'}</Typography>
       </View>
 
       {/* Account Settings */}
       <View className="p-4">
-        <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+        <Typography variant="caption" className="mb-2 px-2">
           ACCOUNT SETTINGS
         </Typography>
 
         <Card className="rounded-xl bg-white">
           <TouchableOpacity
-            className="flex-row items-center justify-between border-b border-gray-100 p-4"
+            className="flex-row items-center justify-between border-b border-gray-200 p-4 dark:border-gray-800"
             onPress={() => router.push('/account/personal')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full p-2 ">
                 <Ionicons name="person-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>Personal Information</Typography>
@@ -57,10 +55,10 @@ export const ProfileDetail = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-row items-center justify-between border-b border-gray-100 p-4"
+            className="flex-row items-center justify-between border-b border-gray-200 p-4 dark:border-gray-800"
             onPress={() => router.push('/account/payment')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                 <Ionicons name="card-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>Payment Methods</Typography>
@@ -72,7 +70,7 @@ export const ProfileDetail = () => {
             className="flex-row items-center justify-between p-4"
             onPress={() => router.push('/account/security')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                 <Ionicons name="lock-closed-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>Security</Typography>
@@ -81,7 +79,6 @@ export const ProfileDetail = () => {
           </TouchableOpacity>
         </Card>
       </View>
-
       {/* App Settings */}
       <View className="p-4">
         <Typography variant="caption" className="mb-2 px-2 text-gray-500">
@@ -90,10 +87,10 @@ export const ProfileDetail = () => {
 
         <Card className="rounded-xl bg-white">
           <TouchableOpacity
-            className="flex-row items-center justify-between border-b border-gray-100 p-4"
+            className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
             onPress={() => router.push('/account/notification')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                 <Ionicons name="notifications-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>Notifications</Typography>
@@ -102,10 +99,10 @@ export const ProfileDetail = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-row items-center justify-between border-b border-gray-100 p-4"
+            className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
             onPress={() => router.push('/account/appearance')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                 <Ionicons name="color-palette-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>Appearance</Typography>
@@ -117,7 +114,7 @@ export const ProfileDetail = () => {
             className="flex-row items-center justify-between p-4"
             onPress={() => router.push('/account/language')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                 <Ionicons name="language-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>Language</Typography>
@@ -126,7 +123,6 @@ export const ProfileDetail = () => {
           </TouchableOpacity>
         </Card>
       </View>
-
       {/* Support */}
       <View className="p-4">
         <Typography variant="caption" className="mb-2 px-2 text-gray-500">
@@ -135,10 +131,10 @@ export const ProfileDetail = () => {
 
         <Card className="rounded-xl bg-white">
           <TouchableOpacity
-            className="flex-row items-center justify-between border-b border-gray-100 p-4"
+            className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
             onPress={() => router.push('/account/help')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                 <Ionicons name="help-circle-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>Help Center</Typography>
@@ -150,7 +146,7 @@ export const ProfileDetail = () => {
             className="flex-row items-center justify-between p-4"
             onPress={() => router.push('/account/about')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30 dark:bg-blue-950/30">
                 <Ionicons name="information-circle-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>About</Typography>
@@ -159,7 +155,6 @@ export const ProfileDetail = () => {
           </TouchableOpacity>
         </Card>
       </View>
-
       {/* Sign Out Button */}
       <View className="p-4">
         <Button className="bg-red-500" size="lg" onPress={signOut}>
@@ -169,7 +164,6 @@ export const ProfileDetail = () => {
           </View>
         </Button>
       </View>
-
       {/* Version Info */}
       <View className="items-center pb-8 pt-2">
         <Typography className="text-sm text-gray-400">Version 1.0.0</Typography>

@@ -45,7 +45,7 @@ export const HelpCenter = () => {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="p-4">
         {/* Header */}
         <Typography variant="heading" className="mb-6 text-xl font-bold">
@@ -53,28 +53,28 @@ export const HelpCenter = () => {
         </Typography>
 
         {/* Search */}
-        <View className="mb-6 flex-row items-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+        <View className="mb-6 flex-row items-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-950/30">
           <Ionicons name="search-outline" size={20} color="#6b7280" />
-          <Typography className="ml-2 text-gray-500">Search for help...</Typography>
+          <Typography className="ml-2">Search for help...</Typography>
         </View>
 
         {/* Quick Help */}
         <View className="mb-6">
-          <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+          <Typography variant="caption" className="mb-2 px-2">
             QUICK HELP
           </Typography>
 
           <View className="flex-row flex-wrap">
-            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2">
+            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-800">
               <Typography>Booking Issues</Typography>
             </TouchableOpacity>
-            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2">
+            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-800">
               <Typography>Payment Problems</Typography>
             </TouchableOpacity>
-            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2">
+            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-800">
               <Typography>Account Settings</Typography>
             </TouchableOpacity>
-            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2">
+            <TouchableOpacity className="m-1 rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-800">
               <Typography>App Features</Typography>
             </TouchableOpacity>
           </View>
@@ -82,17 +82,19 @@ export const HelpCenter = () => {
 
         {/* FAQs */}
         <View className="mb-6">
-          <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+          <Typography variant="caption" className="mb-2 px-2">
             FREQUENTLY ASKED QUESTIONS
           </Typography>
 
-          <View className="rounded-lg border border-gray-200">
+          <View className="rounded-lg border border-gray-200 dark:border-gray-800">
             {faqs.map((faq, index) => (
               <View
                 key={index}
-                className={index !== faqs.length - 1 ? 'border-b border-gray-200' : ''}>
+                className={
+                  index !== faqs.length - 1 ? 'border-b border-gray-200 dark:border-gray-800' : ''
+                }>
                 <TouchableOpacity
-                  className="flex-row items-center justify-between p-4"
+                  className="flex-row items-center justify-between bg-gray-50 p-4 dark:bg-gray-950/30"
                   onPress={() => toggleFAQ(index)}>
                   <Typography className="flex-1 font-medium">{faq.question}</Typography>
                   <Ionicons
@@ -103,7 +105,7 @@ export const HelpCenter = () => {
                 </TouchableOpacity>
 
                 {expandedFAQ === index && (
-                  <View className="border-t border-gray-100 bg-gray-50 p-4">
+                  <View className="border-t border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
                     <Typography className="text-gray-600">{faq.answer}</Typography>
                   </View>
                 )}

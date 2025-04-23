@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, ViewProps } from 'react-native';
 import { cn } from '../../libs/index';
 
@@ -9,7 +8,10 @@ interface CardProps extends ViewProps {
 export function Card({ className, ...props }: CardProps) {
   return (
     <View
-      className={cn('rounded-lg bg-white shadow dark:bg-gray-800 dark:shadow-gray-900', className)}
+      className={cn(
+        'rounded-lg bg-white shadow-sm dark:bg-gray-900/30 dark:shadow-gray-900',
+        className
+      )}
       {...props}
     />
   );

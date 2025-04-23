@@ -13,7 +13,7 @@ export default function ProfileLayout() {
         headerBackButtonDisplayMode: 'generic',
         headerShadowVisible: false,
         headerStyle: {
-          backgroundColor: isDark ? '#1f2937' : '#ffffff',
+          backgroundColor: isDark ? 'rgb(23, 37, 84, 0.3)' : '#ffffff',
         },
         headerTintColor: isDark ? '#f3f4f6' : '#111827',
         headerTitleStyle: {
