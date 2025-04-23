@@ -12,6 +12,7 @@ import { EndpointT } from '~/src/types/endpoints';
 type ParkingEndpointKeys =
   | 'GET_PARKING'
   | 'POST_ADD_PARKING'
+  | 'POST_ADD_BOOKING'
   | 'GET_PARKING_BY_USER_ID'
   | 'PUT_PARKING_UPDATE_RATING'
   | 'GET_RANDOM_PARKING'
@@ -33,6 +34,7 @@ type ParkingEndpointKeys =
 
 export const PARKING_ENDPOINT: EndpointT<ParkingEndpointKeys> = {
   GET_PARKING: '/parking?page=:page',
+  POST_ADD_BOOKING: '/parking/:id/booking',
   PUT_PARKING_UPDATE_RATING: '/parking/:id/rating',
   GET_RANDOM_PARKING: '/parking/random?page=:page&limit=:limit',
   GET_PARKING_BY_ID: '/parking/:id',

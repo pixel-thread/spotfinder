@@ -4,9 +4,10 @@ export default function ProfileLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
-        headerTitle: '',
+        headerShown: true,
+        headerTitle: 'Account',
         headerBackButtonDisplayMode: 'generic',
+        headerShadowVisible: false,
       }}
     />
   );

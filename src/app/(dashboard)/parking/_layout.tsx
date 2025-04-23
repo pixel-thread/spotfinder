@@ -32,8 +32,8 @@ export default function ParkingLayout() {
         title: '',
         headerBackButtonDisplayMode: 'generic',
         headerTitle: () => (
-          <View className="w-full flex-col items-center gap-3 py-2">
-            <View className="h-12 flex-1 flex-row items-center rounded-lg bg-gray-100 px-2">
+          <View className="w-full flex-col items-center">
+            <View className="h-10 flex-1 flex-row items-center rounded-lg bg-gray-100 px-2">
               <Ionicons name="search" size={16} color="#6b7280" />
               <TextInput
                 placeholder="Search parking..."
@@ -49,7 +49,6 @@ export default function ParkingLayout() {
                 </TouchableOpacity>
               )}
             </View>
-            <ParkingFilter />
           </View>
         ),
       }}

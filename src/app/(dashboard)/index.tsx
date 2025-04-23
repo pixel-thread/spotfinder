@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'expo-router';
+import { useColorScheme } from 'nativewind';
 import { View, ScrollView, TouchableOpacity, Image, Text } from 'react-native';
 import { z } from 'zod';
 
@@ -38,6 +39,7 @@ const activeParking = [
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
 const HomePage = () => {
+  const { colorScheme } = useColorScheme();
   const { user } = useAuth();
   const page = '1';
   const searchQuery = '';
@@ -50,7 +52,7 @@ const HomePage = () => {
     select: (data) => data.data,
   });
   return (
-    <Container className="flex-1">
+    <Container className={`flex-1 ${colorScheme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header */}
         <View className="my-2 rounded-lg bg-white p-4">

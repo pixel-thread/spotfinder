@@ -92,7 +92,9 @@ const BookingPage = () => {
           refreshControl={<RefreshControl refreshing={isIdle} onRefresh={onRefresh} />}
           onEndReachedThreshold={0.5}
           onEndReached={onPressLoadMore}
-          ListEmptyComponent={<ParkingNotFoundCard />}
+          ListEmptyComponent={
+            isLoadingMore ? <ParkingCardSkeleton value={3} /> : <ParkingNotFoundCard />
+          }
           ListFooterComponent={isLoadingMore ? <ParkingCardSkeleton value={3} /> : null}
         />
       )}

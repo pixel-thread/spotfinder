@@ -1,15 +1,13 @@
 import { SafeAreaView } from 'react-native';
+
 import { cn } from '../libs';
 
-type ContainerProps = {
-  children: React.ReactNode;
-  className?: string;
-};
+interface ContainerProps extends React.ComponentProps<typeof SafeAreaView> {}
 
-export const Container = ({ children, className }: ContainerProps) => {
-  return <SafeAreaView className={cn(className, styles.container)}>{children}</SafeAreaView>;
-};
-
-const styles = {
-  container: 'flex flex-1 px-3',
+export const Container = ({ children, className, ...props }: ContainerProps) => {
+  return (
+    <SafeAreaView {...props} className={cn(className, 'flex flex-1 px-3')}>
+      {children}
+    </SafeAreaView>
+  );
 };
