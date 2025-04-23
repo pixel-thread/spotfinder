@@ -41,15 +41,15 @@ export const LanguageSettings = () => {
         {showRecentLanguages && recentLanguages.length > 0 && (
           <View className="mb-6">
             <View className="mb-2 flex-row items-center justify-between px-2">
-              <Typography variant="caption" className="text-gray-500">
+              <Typography variant="caption" className="text-gray-500 dark:text-gray-400">
                 RECENTLY USED
               </Typography>
               <TouchableOpacity onPress={() => setShowRecentLanguages(false)}>
-                <Typography className="text-sm text-blue-600">Hide</Typography>
+                <Typography className="text-sm text-blue-600 dark:text-blue-400">Hide</Typography>
               </TouchableOpacity>
             </View>
 
-            <View className="rounded-lg border border-gray-200">
+            <View className="rounded-lg border border-gray-200 dark:border-gray-800 dark:bg-gray-950">
               {recentLanguages.map((langCode) => {
                 const lang = languages.find((l) => l.code === langCode);
                 if (!lang) return null;
@@ -58,20 +58,26 @@ export const LanguageSettings = () => {
                   <TouchableOpacity
                     key={lang.code}
                     className={`flex-row items-center justify-between p-4 ${
-                      langCode === selectedLanguage ? 'bg-blue-50' : ''
-                    } ${langCode !== recentLanguages[recentLanguages.length - 1] ? 'border-b border-gray-200' : ''}`}
+                      langCode === selectedLanguage ? 'bg-blue-50 dark:bg-blue-950/30' : ''
+                    } ${langCode !== recentLanguages[recentLanguages.length - 1] ? 'border-b border-gray-200 dark:border-gray-800' : ''}`}
                     onPress={() => setSelectedLanguage(lang.code)}>
                     <View>
                       <Typography
                         className={
-                          langCode === selectedLanguage ? 'font-medium text-blue-600' : ''
+                          langCode === selectedLanguage
+                            ? 'font-medium text-blue-600 dark:text-blue-400'
+                            : ''
                         }>
                         {lang.name}
                       </Typography>
-                      <Typography className="text-sm text-gray-500">{lang.nativeName}</Typography>
+                      <Typography className="text-sm ">{lang.nativeName}</Typography>
                     </View>
                     {langCode === selectedLanguage && (
-                      <Ionicons name="checkmark" size={20} color="#3b82f6" />
+                      <Ionicons
+                        name="checkmark"
+                        size={20}
+                        color={selectedLanguage ? '#3b82f6' : '#60a5fa'}
+                      />
                     )}
                   </TouchableOpacity>
                 );
@@ -82,27 +88,37 @@ export const LanguageSettings = () => {
 
         {/* All Languages */}
         <View className="mb-6">
-          <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+          <Typography variant="caption" className="mb-2 px-2 text-gray-500 dark:text-gray-400">
             ALL LANGUAGES
           </Typography>
 
-          <View className="rounded-lg border border-gray-200">
+          <View className="dark:bg-gay-950 rounded-lg border border-gray-200 dark:border-gray-800">
             {languages.map((lang, index) => (
               <TouchableOpacity
                 key={lang.code}
                 className={`flex-row items-center justify-between p-4 ${
-                  lang.code === selectedLanguage ? 'bg-blue-50' : ''
-                } ${index !== languages.length - 1 ? 'border-b border-gray-200' : ''}`}
+                  lang.code === selectedLanguage ? 'bg-blue-50 dark:bg-blue-950/30' : ''
+                } ${index !== languages.length - 1 ? 'border-b border-gray-200 dark:border-gray-800' : ''}`}
                 onPress={() => setSelectedLanguage(lang.code)}>
                 <View>
                   <Typography
-                    className={lang.code === selectedLanguage ? 'font-medium text-blue-600' : ''}>
+                    className={
+                      lang.code === selectedLanguage
+                        ? 'font-medium text-blue-600 dark:text-blue-400'
+                        : ''
+                    }>
                     {lang.name}
                   </Typography>
-                  <Typography className="text-sm text-gray-500">{lang.nativeName}</Typography>
+                  <Typography className="text-sm text-gray-500 dark:text-gray-400">
+                    {lang.nativeName}
+                  </Typography>
                 </View>
                 {lang.code === selectedLanguage && (
-                  <Ionicons name="checkmark" size={20} color="#3b82f6" />
+                  <Ionicons
+                    name="checkmark"
+                    size={20}
+                    color={selectedLanguage ? '#3b82f6' : '#60a5fa'}
+                  />
                 )}
               </TouchableOpacity>
             ))}
@@ -110,30 +126,30 @@ export const LanguageSettings = () => {
         </View>
 
         {/* App Language vs Content Language */}
-        <View className="mb-6 rounded-lg bg-gray-50 p-4">
+        <View className="mb-6 rounded-lg border border-gray-800 bg-gray-50 p-4 dark:bg-gray-950">
           <Typography className="mb-2 font-medium">Language Settings</Typography>
           <View className="space-y-2">
-            <Typography className="text-sm text-gray-600">
+            <Typography className="text-sm text-gray-600 dark:text-gray-300">
               • App Language: Controls the language of the app interface
             </Typography>
-            <Typography className="text-sm text-gray-600">
+            <Typography className="text-sm text-gray-600 dark:text-gray-300">
               • Content Language: May vary based on available translations
             </Typography>
-            <Typography className="text-sm text-gray-600">
+            <Typography className="text-sm text-gray-600 dark:text-gray-300">
               • Some content may not be available in all languages
             </Typography>
           </View>
         </View>
 
         {/* Contribute */}
-        <TouchableOpacity className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <TouchableOpacity className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/30">
           <View className="flex-row items-center">
             <Ionicons name="globe-outline" size={20} color="#3b82f6" />
-            <Typography className="ml-2 font-medium text-blue-600">
+            <Typography className="ml-2 font-medium text-blue-600 dark:text-blue-400">
               Help Improve Translations
             </Typography>
           </View>
-          <Typography className="mt-1 text-sm text-gray-600">
+          <Typography className="mt-1 text-sm text-gray-600 dark:text-gray-300">
             Join our community of translators to help make the app available in more languages.
           </Typography>
         </TouchableOpacity>
