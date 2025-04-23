@@ -5,35 +5,36 @@ import { View, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { useColorScheme } from 'nativewind';
+import { Card } from '../../ui/card';
 
 export const ProfileDetail = () => {
   const { user, onLogout: signOut } = useAuth();
   const router = useRouter();
+  const { colorScheme } = useColorScheme();
 
   return (
-    <ScrollView className="flex-1 bg-white">
-      {/* Profile Header */}
-      <View className="items-center border-b border-gray-100 bg-white p-6">
-        <View className="mb-4 h-24 w-24 overflow-hidden rounded-full bg-gray-200">
+    <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-950">
+      <View className="items-center p-6">
+        <View className="mb-4 h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
           {user?.profilePic ? (
             <Image source={{ uri: user.profilePic }} className="h-full w-full" resizeMode="cover" />
           ) : (
             <View className="h-full w-full items-center justify-center">
-              <Ionicons name="person" size={50} color="#9ca3af" />
+              <Ionicons
+                name="person"
+                size={50}
+                color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'}
+              />
             </View>
           )}
         </View>
-        <Typography variant="heading" className="mb-1 text-xl font-bold">
-          {user?.name || 'User Name'}
+        <Typography variant="heading" className="text-xl font-bold text-gray-900 dark:text-gray-50">
+          {user?.name || 'Guest User'}
         </Typography>
-        <Typography className="text-gray-500">{user?.auth.email || 'user@example.com'}</Typography>
-
-        <TouchableOpacity
-          className="mt-3 flex-row items-center rounded-full bg-blue-50 px-4 py-2"
-          onPress={() => router.push('/account/personal/edit')}>
-          <Ionicons name="create-outline" size={16} color="#3b82f6" />
-          <Typography className="ml-1 text-blue-600">Edit Profile</Typography>
-        </TouchableOpacity>
+        <Typography className="text-gray-500 dark:text-gray-400">
+          {user?.auth.email || 'guest@example.com'}
+        </Typography>
       </View>
 
       {/* Account Settings */}
@@ -42,7 +43,7 @@ export const ProfileDetail = () => {
           ACCOUNT SETTINGS
         </Typography>
 
-        <View className="rounded-xl bg-white">
+        <Card className="rounded-xl bg-white">
           <TouchableOpacity
             className="flex-row items-center justify-between border-b border-gray-100 p-4"
             onPress={() => router.push('/account/personal')}>
@@ -78,7 +79,7 @@ export const ProfileDetail = () => {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
-        </View>
+        </Card>
       </View>
 
       {/* App Settings */}
@@ -87,7 +88,7 @@ export const ProfileDetail = () => {
           APP SETTINGS
         </Typography>
 
-        <View className="rounded-xl bg-white">
+        <Card className="rounded-xl bg-white">
           <TouchableOpacity
             className="flex-row items-center justify-between border-b border-gray-100 p-4"
             onPress={() => router.push('/account/notification')}>
@@ -123,7 +124,7 @@ export const ProfileDetail = () => {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
-        </View>
+        </Card>
       </View>
 
       {/* Support */}
@@ -132,7 +133,7 @@ export const ProfileDetail = () => {
           SUPPORT
         </Typography>
 
-        <View className="rounded-xl bg-white">
+        <Card className="rounded-xl bg-white">
           <TouchableOpacity
             className="flex-row items-center justify-between border-b border-gray-100 p-4"
             onPress={() => router.push('/account/help')}>
@@ -156,7 +157,7 @@ export const ProfileDetail = () => {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
-        </View>
+        </Card>
       </View>
 
       {/* Sign Out Button */}

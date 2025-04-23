@@ -7,6 +7,7 @@ import { Typography } from '../../ui/typography';
 
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { parkingSchema } from '~/src/utils/validation/parking';
+import { useColorScheme } from 'nativewind';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
@@ -17,13 +18,29 @@ type ParkingCardProps = {
 export const ParkingCard = ({ parking }: ParkingCardProps) => {
   const router = useRouter();
   const { user } = useAuth();
+  const { colorScheme } = useColorScheme(); // Add this import
+
   return (
     <TouchableOpacity
       key={parking.id}
       onPress={() => router.push(`/parking/${parking.id}`)}
-      className="mb-4 overflow-hidden rounded-lg bg-white shadow-sm">
-      <Image source={{ uri: parking.image }} className="aspect-video w-full" resizeMode="cover" />
+      className="mb-4 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
+      <Image source={{ uri: parking.image }} className="h-40 w-full" resizeMode="cover" />
       <View className="p-4">
+        <Typography className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+          {parking.name}
+        </Typography>
+        <View className="mt-1 flex-row items-center">
+          <Ionicons
+            name="location-outline"
+            size={16}
+            color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'}
+          />
+          <Typography className="ml-1 text-gray-500 dark:text-gray-400">
+            {parking.address}
+          </Typography>
+        </View>
+
         <View className="mb-1 flex-row items-center justify-between">
           <Text className="text-lg font-bold text-gray-900">{parking.name}</Text>
           <View className="flex-row items-center">

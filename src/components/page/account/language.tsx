@@ -30,7 +30,7 @@ export const LanguageSettings = () => {
   const recentLanguages = ['en', 'hi'];
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-950">
       <View className="p-4">
         {/* Header */}
         <Typography variant="heading" className="mb-6 text-xl font-bold">

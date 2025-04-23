@@ -1,31 +1,35 @@
-import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 
 import { Typography } from '~/src/components/ui/typography';
 
 export const About = () => {
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1">
       <View className="p-4">
         {/* Header */}
-        <Typography variant="heading" className="mb-6 text-xl font-bold">
+        <Typography
+          variant="heading"
+          className="mb-6 text-xl font-bold text-gray-900 dark:text-gray-50">
           About
         </Typography>
 
         {/* App Info */}
         <View className="mb-6 items-center">
-          <View className="mb-3 h-24 w-24 items-center justify-center rounded-xl bg-blue-500">
+          <View className="mb-3 h-24 w-24 items-center justify-center rounded-xl bg-blue-500 dark:bg-blue-600">
             <Ionicons name="car" size={48} color="white" />
           </View>
-          <Typography variant="heading" className="text-xl font-bold">
+          <Typography
+            variant="heading"
+            className="text-xl font-bold text-gray-900 dark:text-gray-50">
             Parking App
           </Typography>
-          <Typography className="text-gray-500">Version 1.0.0</Typography>
+          <Typography className="text-gray-500 dark:text-gray-400">Version 1.0.0</Typography>
         </View>
 
         {/* Description */}
-        <View className="mb-6 rounded-lg bg-gray-50 p-4">
-          <Typography className="text-center text-gray-600">
+        <View className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+          <Typography className="text-center text-gray-600 dark:text-gray-300">
             Parking App helps you find and book parking spaces in your city with ease. Save time and
             avoid the hassle of finding parking spots.
           </Typography>

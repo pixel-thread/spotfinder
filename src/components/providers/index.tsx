@@ -16,7 +16,7 @@ export const MainProviders = ({ children }: Props) => {
       <AuthProvider>
         <SubscriptionProvider>
           <AuthGuard>
-            <View className="h-full w-full bg-gray-100">{children}</View>
+            <View className="h-full w-full bg-gray-100 dark:bg-gray-950">{children}</View>
             <Toast position="bottom" topOffset={50} />
           </AuthGuard>
         </SubscriptionProvider>

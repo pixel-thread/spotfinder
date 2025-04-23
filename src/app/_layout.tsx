@@ -5,11 +5,14 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import './global.css';
 
 import { MainProviders } from '~/src/components/providers';
+import { useColorScheme } from 'nativewind';
 
 export default function RootLayout() {
+  const { setColorScheme } = useColorScheme();
+  setColorScheme('system');
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-gray-200">
+      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-950">
         <StatusBar />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
