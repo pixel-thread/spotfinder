@@ -78,7 +78,7 @@ const profileSectionsWithOutAuth: ProfileSection[] = [
 ];
 
 const AuthProfile = () => {
-  const { user, onLogout, refresh } = useAuth();
+  const { user, onLogout } = useAuth();
   const router = useRouter();
 
   const onPressLogout = () => {
