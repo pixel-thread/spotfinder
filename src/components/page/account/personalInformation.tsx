@@ -11,14 +11,6 @@ export const PersonalInformation = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.auth.email || '',
-    phone: user?.auth.email || '',
-    address: user?.role || '',
-  });
-
   return (
     <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="p-4">
@@ -37,26 +29,22 @@ export const PersonalInformation = () => {
           {/* Name */}
           <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <Typography className="mb-1 text-sm text-gray-500">Full Name</Typography>
-            <Typography className="text-base">{formData.name || 'Not provided'}</Typography>
+            <Typography className="text-base">{user?.name || 'Not provided'}</Typography>
           </View>
 
           {/* Email */}
           <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <Typography className="mb-1 text-sm text-gray-500">Email Address</Typography>
-            <Typography className="text-base">{formData.email || 'Not provided'}</Typography>
+            <Typography className="text-base">{user?.auth?.email || 'Not provided'}</Typography>
           </View>
 
           {/* Phone */}
           <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
             <Typography className="mb-1 text-sm text-gray-500">Phone Number</Typography>
-            <Typography className="text-base">{formData.phone || 'Not provided'}</Typography>
+            <Typography className="text-base">{user?.auth?.phone || 'Not provided'}</Typography>
           </View>
 
           {/* Address */}
-          <View className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
-            <Typography className="mb-1 text-sm text-gray-500">Address</Typography>
-            <Typography className="text-base">{formData.address || 'Not provided'}</Typography>
-          </View>
         </View>
 
         {/* Privacy Note */}
