@@ -1,11 +1,38 @@
 import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { View, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { z } from 'zod';
 
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { USER_ENDPOINT } from '~/src/libs/endpoints/user';
+import http from '~/src/utils/https';
+import { toast } from '../../ui/toast';
+import { UserT } from '~/src/types/auth/context';
+import { useMutation } from '@tanstack/react-query';
+import { Input } from '../../ui/input';
+import { passwordValidation } from '~/src/utils/validation/passwordValidation';
+
+const model = z
+  .object({
+    newPassword: passwordValidation,
+    confirmPassword: passwordValidation,
+  })
+  .superRefine(({ newPassword, confirmPassword }, ctx) => {
+    if (newPassword !== confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+      });
+    }
+  });
+
+type FormValues = z.infer<typeof model>;
 
 export const Security = () => {
   const { user } = useAuth();
@@ -14,43 +41,28 @@ export const Security = () => {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
 
-  // Password form state
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+  const form = useForm<FormValues>({
+    resolver: zodResolver(model),
   });
 
-  const [passwordVisible, setPasswordVisible] = useState({
-    current: false,
-    new: false,
-    confirm: false,
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: FormValues) =>
+      http.put<UserT>(USER_ENDPOINT.PUT_USER_PASSWORD.replace(':id', user?.id || ''), {
+        password: data.newPassword,
+      }),
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message);
+        router.replace('/account/personal');
+        setIsChangingPassword(false);
+        return data.data;
+      }
+      toast.error(data.message);
+      return data.data;
+    },
   });
 
-  const handlePasswordChange = (field: string, value: string) => {
-    setPasswordForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
-    setPasswordVisible((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
-
-  const handleSavePassword = () => {
-    // Here you would implement the API call to update password
-    // For now, we'll just toggle back to view mode
-    setIsChangingPassword(false);
-    setPasswordForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
-  };
+  const onSubmit: SubmitHandler<FormValues> = (data) => mutate(data);
 
   return (
     <ScrollView className="flex-1 bg-white dark:bg-gray-950">
@@ -68,7 +80,7 @@ export const Security = () => {
             <Typography className="ml-2 font-medium">Last Login</Typography>
           </View>
           <Typography className="mt-1 text-sm text-gray-600">
-            {new Date().toLocaleString()} • IP: 192.168.1.1
+            {user?.lastLogin.split('T')[0]} • IP: 192.168.1.1
           </Typography>
         </View>
 
@@ -88,53 +100,29 @@ export const Security = () => {
                 </TouchableOpacity>
               )}
             </View>
+
             {!isChangingPassword ? (
               <Typography className="mt-1 text-sm">Last changed 30 days ago</Typography>
             ) : (
               <View className="mt-4 space-y-4">
-                {/* Current Password */}
-                <View className="relative">
-                  <Typography className="mb-1 text-sm text-gray-500">Current Password</Typography>
-                  <View className="flex-row items-center">
-                    <TextInput
-                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
-                      value={passwordForm.currentPassword}
-                      onChangeText={(value) => handlePasswordChange('currentPassword', value)}
-                      placeholder="Enter current password"
-                      secureTextEntry={!passwordVisible.current}
-                    />
-                    <TouchableOpacity
-                      className="absolute right-3"
-                      onPress={() => togglePasswordVisibility('current')}>
-                      <Ionicons
-                        name={passwordVisible.current ? 'eye-off-outline' : 'eye-outline'}
-                        size={20}
-                        color="#6b7280"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
                 {/* New Password */}
                 <View className="relative">
                   <Typography className="mb-1 text-sm text-gray-500">New Password</Typography>
                   <View className="flex-row items-center">
-                    <TextInput
-                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
-                      value={passwordForm.newPassword}
-                      onChangeText={(value) => handlePasswordChange('newPassword', value)}
-                      placeholder="Enter new password"
-                      secureTextEntry={!passwordVisible.new}
+                    <Controller
+                      control={form.control}
+                      name="newPassword"
+                      render={({ field: { onChange, value, ...field } }) => (
+                        <Input
+                          {...field}
+                          className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
+                          error={form.formState.errors.newPassword?.message}
+                          onChangeText={onChange}
+                          value={value}
+                          placeholder="Enter new password"
+                        />
+                      )}
                     />
-                    <TouchableOpacity
-                      className="absolute right-3"
-                      onPress={() => togglePasswordVisibility('new')}>
-                      <Ionicons
-                        name={passwordVisible.new ? 'eye-off-outline' : 'eye-outline'}
-                        size={20}
-                        color="#6b7280"
-                      />
-                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -142,33 +130,29 @@ export const Security = () => {
                 <View className="relative">
                   <Typography className="mb-1 text-sm">Confirm Password</Typography>
                   <View className="flex-row items-center">
-                    <TextInput
-                      className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
-                      value={passwordForm.confirmPassword}
-                      onChangeText={(value) => handlePasswordChange('confirmPassword', value)}
-                      placeholder="Confirm new password"
-                      secureTextEntry={!passwordVisible.confirm}
+                    <Controller
+                      control={form.control}
+                      name="confirmPassword"
+                      render={({ field: { onChange, value, ...field } }) => (
+                        <Input
+                          {...field}
+                          className="flex-1 rounded-lg border border-gray-200 p-2 text-base dark:border-gray-800"
+                          value={value}
+                          onChangeText={onChange}
+                          placeholder="Confirm new password"
+                          error={form.formState.errors.confirmPassword?.message}
+                        />
+                      )}
                     />
-                    <TouchableOpacity
-                      className="absolute right-3"
-                      onPress={() => togglePasswordVisibility('confirm')}>
-                      <Ionicons
-                        name={passwordVisible.confirm ? 'eye-off-outline' : 'eye-outline'}
-                        size={20}
-                        color="#6b7280"
-                      />
-                    </TouchableOpacity>
                   </View>
                 </View>
 
                 {/* Action Buttons */}
                 <View className="mt-2 flex-row gap-4">
-                  <Button
-                    className="flex-1 bg-gray-200 "
-                    onPress={() => setIsChangingPassword(false)}>
+                  <Button variant="secondary" onPress={() => setIsChangingPassword(false)}>
                     Cancel
                   </Button>
-                  <Button className="flex-1 bg-blue-600" onPress={handleSavePassword}>
+                  <Button className="flex-1" onPress={form.handleSubmit(onSubmit)}>
                     Update
                   </Button>
                 </View>
