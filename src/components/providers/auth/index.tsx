@@ -35,9 +35,7 @@ export const AuthProvider = ({ children }: Props) => {
     mutationKey: ['user'],
     mutationFn: () => http.get<UserT>(AUTH_ENDPOINT.GET_ME),
     onSuccess: async (data) => {
-      logger.info({ isUserSuccessFetch: data.success, data: data.data });
       if (data.success) {
-        logger.log({ data: data.data });
         const userData = data.data;
         setUser(userData);
         if (userData) {
