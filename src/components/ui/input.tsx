@@ -15,7 +15,7 @@ type InputProps = TextInputProps & {
 export const Input = React.forwardRef<TextInput, InputProps>(
   ({ label, error, required, className, ...props }, ref) => {
     return (
-      <View className="mb-4">
+      <View className="mb-4 w-full">
         {label && (
           <Typography
             variant="label"

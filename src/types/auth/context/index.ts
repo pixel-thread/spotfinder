@@ -15,6 +15,7 @@ export type UserT = {
   name: string;
   auth: AuthT;
   role: RoleT;
+  lastLogin: string;
   isVerified: boolean;
   profilePic: string | null;
   vehicleType: VehicleTypeT;
