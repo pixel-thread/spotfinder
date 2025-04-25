@@ -1,9 +1,8 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 import { Button } from '~/src/components/ui/button';
-import { Container } from '~/src/components/Container';
 import { Typography } from '~/src/components/ui/typography';
 import { cn } from '~/src/libs';
 import { Input } from '~/src/components/ui/input';
@@ -14,10 +13,8 @@ import { useAuth } from '~/src/hooks/auth/useAuth';
 import { useMutation } from '@tanstack/react-query';
 import http from '~/src/utils/https';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
-import { TextArea } from '~/src/components/ui/textarea';
 import { z } from 'zod';
 import { toast } from '~/src/components/ui/toast';
-import Toast from 'react-native-toast-message';
 
 type FormInput = z.infer<typeof parkingSchema>;
 
@@ -33,7 +30,6 @@ export const AddParkingForm = () => {
   const form = useForm<FormInput>({
     resolver: zodResolver(parkingSchema),
     defaultValues: {
-      price: 0,
       features: [], // string array for amenities
       userId: user?.id, // Add userId from auth
       image: `https://picsum.photos/seed/seed${Math.floor(Math.random() * 100)}/300/200`,
@@ -76,7 +72,7 @@ export const AddParkingForm = () => {
         </Typography>
 
         <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-700">Parking Name</Text>
+          <Typography className="mb-1 text-sm font-medium text-gray-700">Parking Name</Typography>
           <Controller
             control={form.control}
             name="name"
@@ -94,7 +90,7 @@ export const AddParkingForm = () => {
         </View>
 
         <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-700">Address</Text>
+          <Typography className="mb-1 text-sm font-medium text-gray-700">Address</Typography>
           <Controller
             control={form.control}
             name="address"
@@ -113,7 +109,7 @@ export const AddParkingForm = () => {
 
         <View className="flex-row gap-4">
           <View className="flex-1">
-            <Text className="mb-1 text-sm font-medium text-gray-700">City</Text>
+            <Typography className="mb-1 text-sm font-medium text-gray-700">City</Typography>
             <Controller
               control={form.control}
               name="address"
@@ -130,7 +126,7 @@ export const AddParkingForm = () => {
             />
           </View>
           <View className="flex-1">
-            <Text className="mb-1 text-sm font-medium text-gray-700">Pin Code</Text>
+            <Typography className="mb-1 text-sm font-medium text-gray-700">Pin Code</Typography>
             <Controller
               control={form.control}
               name="pinCode"
@@ -157,7 +153,9 @@ export const AddParkingForm = () => {
         </Typography>
 
         <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-700">Hourly Rate (₹)</Text>
+          <Typography className="mb-1 text-sm font-medium text-gray-700">
+            Hourly Rate (₹)
+          </Typography>
           <Controller
             control={form.control}
             name="price"
@@ -181,16 +179,15 @@ export const AddParkingForm = () => {
         <Typography variant="caption" className="mb-3 font-semibold text-gray-800">
           Description
         </Typography>
-        // Description section has wrong field name
         <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-700">
+          <Typography className="mb-1 text-sm font-medium text-gray-700">
             Tell users about your parking space
-          </Text>
+          </Typography>
           <Controller
             control={form.control}
             name="description" // Changed from "address" to "description"
             render={({ field: { onChange, value, ...field } }) => (
-              <TextArea
+              <Input
                 {...field}
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900"
                 placeholder="Describe your parking space..."
@@ -235,10 +232,10 @@ export const AddParkingForm = () => {
                       size={16}
                       color={checked ? '#3b82f6' : '#6b7280'}
                     />
-                    <Text
+                    <Typography
                       className={cn('ml-1 text-sm', checked ? 'text-blue-700' : 'text-gray-700')}>
                       {amenity.label}
-                    </Text>
+                    </Typography>
                   </TouchableOpacity>
                 );
               }}
@@ -257,7 +254,7 @@ export const AddParkingForm = () => {
           className="flex h-32 items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50"
           onPress={() => console.log('Add photo')}>
           <Ionicons name="camera-outline" size={32} color="#6b7280" />
-          <Text className="mt-2 text-sm text-gray-600">Add Photos</Text>
+          <Typography className="mt-2 text-sm text-gray-600">Add Photos</Typography>
         </TouchableOpacity>
       </View>
 
