@@ -1,36 +1,54 @@
 import { useState } from 'react';
-import { View, ScrollView, TextInput } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
+import { Input } from '../../ui/input';
+import { useMutation } from '@tanstack/react-query';
+import http from '~/src/utils/https';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { registerSchema } from '~/src/utils/validation/auth/registeSchema';
+import { toast } from '../../ui/toast';
+import { USER_ENDPOINT } from '~/src/libs/endpoints/user';
+import { useRouter } from 'expo-router';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const model = z.object({
+  name: z.string(),
+  email: z.string(),
+});
+
+type FormValue = z.infer<typeof model>;
 
 export const EditPersonalDetails = () => {
   const { user } = useAuth();
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.auth.email || '',
-    phone: user?.auth.phone || '',
-    address: user?.status || '',
+  const router = useRouter();
+  const form = useForm<FormValue>({
+    resolver: zodResolver(model),
+    defaultValues: {
+      name: user?.name,
+      email: user?.auth?.email,
+    },
   });
-  const [saving, setSaving] = useState(false);
 
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: FormValue) =>
+      http.put(USER_ENDPOINT.PUT_USER.replace(':id', user?.id || ''), data),
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message);
+        router.replace('/account/personal');
+        return data.data;
+      }
+      toast.error(data.message);
+      return data.data;
+    },
+  });
 
-  const handleSave = () => {
-    setSaving(true);
-    // Implement API call to save changes here
-    setTimeout(() => {
-      setSaving(false);
-      // Optionally navigate back or show a success message
-    }, 1200);
-  };
+  const onSubmit: SubmitHandler<FormValue> = (data) => mutate(data);
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -45,56 +63,48 @@ export const EditPersonalDetails = () => {
           {/* Name */}
           <View className="rounded-lg border border-gray-200 p-4">
             <Typography className="mb-1 text-sm text-gray-500">Full Name</Typography>
-            <TextInput
-              className="text-base"
-              value={formData.name}
-              onChangeText={(v) => handleChange('name', v)}
-              placeholder="Enter your full name"
-              autoCapitalize="words"
+            <Controller
+              control={form.control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  className="text-base"
+                  placeholder="Enter your name"
+                  keyboardType="default"
+                  value={value}
+                  onChangeText={onChange}
+                  error={form.formState.errors.name?.message}
+                />
+              )}
             />
           </View>
 
           {/* Email */}
           <View className="rounded-lg border border-gray-200 p-4">
             <Typography className="mb-1 text-sm text-gray-500">Email Address</Typography>
-            <TextInput
-              className="text-base"
-              value={formData.email}
-              onChangeText={(v) => handleChange('email', v)}
-              placeholder="Enter your email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          {/* Phone */}
-          <View className="rounded-lg border border-gray-200 p-4">
-            <Typography className="mb-1 text-sm text-gray-500">Phone Number</Typography>
-            <TextInput
-              className="text-base"
-              value={formData.phone}
-              onChangeText={(v) => handleChange('phone', v)}
-              placeholder="Enter your phone number"
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          {/* Address */}
-          <View className="rounded-lg border border-gray-200 p-4">
-            <Typography className="mb-1 text-sm text-gray-500">Address</Typography>
-            <TextInput
-              className="text-base"
-              value={formData.address}
-              onChangeText={(v) => handleChange('address', v)}
-              placeholder="Enter your address"
-              multiline
+            <Controller
+              control={form.control}
+              name="email"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  className="text-base"
+                  placeholder="Enter your email"
+                  keyboardType="email-address"
+                  value={value}
+                  onChangeText={onChange}
+                  error={form.formState.errors.email?.message}
+                />
+              )}
             />
           </View>
         </View>
 
         {/* Save Button */}
-        <Button className="mt-8 bg-blue-600" onPress={handleSave} disabled={saving}>
-          {saving ? 'Saving...' : 'Save Changes'}
+        <Button
+          onPress={form.handleSubmit(onSubmit)}
+          disabled={isPending}
+          className="mt-8 bg-blue-600">
+          Update
         </Button>
 
         {/* Privacy Note */}
