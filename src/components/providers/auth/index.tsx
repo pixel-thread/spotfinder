@@ -98,6 +98,7 @@ export const AuthProvider = ({ children }: Props) => {
       logger.info('Logout Successfull');
     },
     onError: (error) => {
+      onSuccessLogout();
       setUser(null);
       logger.error({ message: 'Failed to logout but still logged locally', error });
       toast.error('Failed to logout');

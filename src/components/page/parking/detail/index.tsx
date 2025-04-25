@@ -15,6 +15,7 @@ import { useAuth } from '~/src/hooks/auth/useAuth';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
+import { cn } from '~/src/libs';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
@@ -129,8 +130,14 @@ export const ParkingDetailView = ({ parkingId }: { parkingId: string }) => {
             </View>
             <View className="items-center rounded-lg bg-gray-50 px-4 py-3">
               <Typography className="text-gray-500">Available</Typography>
-              <Typography className="text-lg font-bold text-green-600">
-                {parking.available}
+              <Typography
+                className={cn(
+                  parking.slots?.filter((val) => val.isOccupied === false).length === 0
+                    ? 'text-red-600'
+                    : 'text-green-600'
+                )}>
+                {parking.slots?.filter((val) => val.isOccupied === false).length}/
+                {parking.slots?.length}
               </Typography>
             </View>
             <View className="items-center rounded-lg bg-gray-50 px-4 py-3">
@@ -208,10 +215,12 @@ export const ParkingDetailView = ({ parkingId }: { parkingId: string }) => {
       <View className="border-t border-gray-200 bg-white p-4">
         <Button
           className="w-full bg-blue-600"
-          disabled={!user}
+          disabled={parking.slots?.filter((val) => val.isOccupied === false).length === 0}
           size="lg"
           onPress={() => setIsBookingModalOpen(true)}>
-          Book Now
+          {parking.slots?.filter((val) => val.isOccupied === false).length === 0
+            ? 'No Available Spots'
+            : 'Book a Spot'}
         </Button>
       </View>
       <BookingModal

@@ -7,12 +7,14 @@ import { useAuth } from '~/src/hooks/auth/useAuth';
 import { PLAN_ENDPOINT } from '~/src/libs/endpoints/plan';
 import { PlanT, SubscriptionContextI } from '~/src/types/subscription';
 import http from '~/src/utils/https';
+import { toast } from '../../ui/toast';
 
 type SubscriptionProviderProps = {
   children: Readonly<React.ReactNode>;
 };
 
 export const SubscriptionProvider = ({ children }: SubscriptionProviderProps) => {
+  const router = useRouter();
   const { user } = useAuth();
 
   const { isLoading, data: plan } = useSuspenseQuery({
@@ -34,11 +36,20 @@ export const SubscriptionProvider = ({ children }: SubscriptionProviderProps) =>
   });
 
   const { isPending: isSubscribeLoading, mutate: onSubScribe } = useMutation({
-    mutationFn: ({ slot }: { slot: number }) =>
+    mutationFn: ({ slot, id }: { slot: number; id: string }) =>
       http.post(PLAN_ENDPOINT.POST_SUBSCRIBE, {
         slot,
         userId: user?.id,
+        parkingLotId: id,
       }),
+    onSuccess: (data) => {
+      if (data?.success) {
+        toast.success(data.message);
+        router.push('/account/partner');
+        return data.data;
+      }
+      toast.error(data.message);
+    },
   });
 
   const loading = isLoading || isSubscribeLoading || isVerifyLoading;

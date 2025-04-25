@@ -13,7 +13,7 @@ import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
 import { toast } from '~/src/components/ui/toast';
-import Toast from 'react-native-toast-message';
+import { useRouter } from 'expo-router';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
@@ -31,6 +31,7 @@ const calculateDuration = ({ startDate, endDate }: { startDate: Date; endDate: D
 };
 // Inside the BookingModal component, add this skeleton UI for loading state
 export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) => {
+  const router = useRouter();
   const { user } = useAuth();
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date(new Date().getTime() + 60 * 60 * 1000)); // Default 1 hour
@@ -92,7 +93,12 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
     const billableHours = Math.max(1, hours);
     return `₹${(hourlyRate * billableHours).toFixed(2)}`;
   };
-
+  const onPressConfirmBooking = () => {
+    if (user) {
+      mutate();
+    }
+    router.push('/auth');
+  };
   // If loading, show skeleton UI
   if (isLoading || isFetching) {
     return <BookingModalSkeleton />;
@@ -183,12 +189,8 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
             </View>
 
             {/* Confirm Button */}
-            <Button
-              onPress={() => mutate()}
-              disabled={isPending}
-              className="w-full bg-blue-600"
-              size="lg">
-              Confirm Booking
+            <Button onPress={onPressConfirmBooking} disabled={isPending} size="lg">
+              {user ? 'Confirm Booking' : 'Sign In to Book'}
             </Button>
 
             {/* Date/Time Picker would go here - in a real app you'd use a platform-specific picker */}

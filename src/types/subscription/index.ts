@@ -7,6 +7,6 @@ export type PlanT = {
 export interface SubscriptionContextI {
   plan: PlanT | null | undefined;
   isLoading: boolean;
-  onSubscribe: ({ slot }: { slot: number }) => void;
+  onSubscribe: ({ slot, id }: { slot: number; id: string }) => void;
   onVerify: ({ id }: { id: string }) => void;
 }

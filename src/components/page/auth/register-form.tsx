@@ -44,16 +44,16 @@ export const RegisterForm = () => {
     mutationFn: (data: FormValue) => http.post<LoginUser>(AUTH_ENDPOINT.POST_REGISTER, data),
     onSuccess: async (data) => {
       if (data.success) {
-        logger<string>('Login Successfull');
+        logger.log<string>('Login Successfull');
         if (data.token) {
           await saveToken(data.token);
-          logger<string>('Token Set Successfully');
+          logger.log<string>('Token Set Successfully');
           refresh();
           return data.data;
         }
       }
       toast.error(data.message);
-      logger({ message: data.message, error: data?.error });
+      logger.log({ message: data.message, error: data?.error });
       return data.data;
     },
   });
@@ -73,7 +73,7 @@ export const RegisterForm = () => {
               value={value}
               label="Name"
               keyboardType="default"
-              placeholder="Enter your phone number"
+              placeholder="Enter your name"
               error={form.formState.errors.name?.message}
             />
           )}
@@ -90,7 +90,7 @@ export const RegisterForm = () => {
               value={value}
               label="Email"
               keyboardType="email-address"
-              placeholder="Enter your phone number"
+              placeholder="Enter your email address"
               error={form.formState.errors.email?.message}
             />
           )}
@@ -153,7 +153,7 @@ export const RegisterForm = () => {
         className="w-full"
         onPress={form.handleSubmit(onSubmit)}
         size="lg">
-        Login
+        Submit
       </Button>
     </View>
   );

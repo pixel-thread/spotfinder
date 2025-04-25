@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { Container } from '~/src/components/Container';
 import { Button } from '~/src/components/ui/button';
+import { Card } from '~/src/components/ui/card';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
@@ -14,9 +15,19 @@ import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
 const quickActions = [
-  { label: 'Find Spot', icon: 'car', bg: 'bg-blue-100', color: 'text-blue-600' },
-  { label: 'History', icon: 'time-outline', bg: 'bg-orange-100', color: 'text-orange-600' },
-  { label: 'Payment', icon: 'card-outline', bg: 'bg-green-100', color: 'text-green-600' },
+  { label: 'Find Spot', icon: 'car', bg: 'bg-blue-100', color: 'text-black dark:text-black' },
+  {
+    label: 'History',
+    icon: 'time-outline',
+    bg: 'bg-orange-100',
+    color: 'text-black dark:text-black',
+  },
+  {
+    label: 'Payment',
+    icon: 'card-outline',
+    bg: 'bg-green-100',
+    color: 'text-black dark:text-black',
+  },
 ];
 
 const recentSpots = [
@@ -39,7 +50,6 @@ const activeParking = [
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
 const HomePage = () => {
-  const { colorScheme } = useColorScheme();
   const { user } = useAuth();
   const page = '1';
   const searchQuery = '';
@@ -52,10 +62,10 @@ const HomePage = () => {
     select: (data) => data.data,
   });
   return (
-    <Container className={`flex-1 ${colorScheme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+    <Container className="bg-white dark:bg-gray-950">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header */}
-        <View className="my-2 rounded-lg bg-white p-4">
+        <Card className="my-2 rounded-lg bg-white p-4">
           <View className="my-6 flex-row items-center justify-between rounded-lg">
             <View>
               <Typography variant="heading">Hello 👋</Typography>
@@ -81,13 +91,11 @@ const HomePage = () => {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </Card>
         {/* Active Parking Section */}
         {activeParking.length > 0 && (
           <View className="mb-6">
-            <Typography className="mb-3 text-lg font-medium text-gray-800">
-              Active Parking
-            </Typography>
+            <Typography className="mb-3 text-lg font-medium">Active Parking</Typography>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {activeParking.map((parking, idx) => (
                 <TouchableOpacity
@@ -106,8 +114,8 @@ const HomePage = () => {
                     <Ionicons name="car-outline" size={16} color="white" />
                     <Typography className="ml-1 text-white">Spot {parking.spot}</Typography>
                   </View>
-                  <Button className="mt-3 bg-white" size="sm">
-                    <Typography className="text-blue-500">Extend Time</Typography>
+                  <Button className="mt-3 w-full bg-white" size="sm">
+                    <Typography className="text-black dark:text-black">Extend Time</Typography>
                   </Button>
                 </TouchableOpacity>
               ))}
@@ -116,7 +124,7 @@ const HomePage = () => {
         )}
 
         {/* Promo / CTA Section */}
-        <View className="mb-6 rounded-2xl bg-blue-50 p-4 shadow-sm">
+        <View className="mb-6 rounded-2xl bg-blue-50 p-4 shadow-sm dark:bg-gray-800">
           <View className="mb-3 flex-row items-center justify-between">
             <Typography className="text-lg font-semibold text-gray-800">
               Looking for parking?
@@ -193,26 +201,27 @@ const HomePage = () => {
 
         {/* Recent Spots */}
         <Typography className="mb-4 text-lg font-medium text-gray-800">Recent Spots</Typography>
-        {recentSpots.map((item, index) => (
-          <TouchableOpacity
-            key={`recent-${index}`}
-            className="mb-3 flex-row items-center justify-between rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-            <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-100 p-2">
-                <Ionicons name="car" size={22} color="#4c669f" />
-              </View>
-              <View>
-                <Typography className="font-semibold text-gray-900">{item.name}</Typography>
-                <Typography className="text-sm text-gray-600">{item.time}</Typography>
-              </View>
-            </View>
-            <View className="items-end">
-              <Typography className="font-bold text-blue-600">{item.price}</Typography>
-              <Typography className="text-xs text-gray-500">{item.distance}</Typography>
-            </View>
-          </TouchableOpacity>
-        ))}
-
+        <View className="flex flex-col gap-2">
+          {recentSpots.map((item, index) => (
+            <Card key={`recent-${index}`}>
+              <TouchableOpacity className="mb-3 flex-row items-center justify-between p-4">
+                <View className="flex-row items-center">
+                  <View className="mr-3 rounded-full bg-blue-100 p-2">
+                    <Ionicons name="car" size={22} color="#4c669f" />
+                  </View>
+                  <View>
+                    <Typography className="font-semibold text-gray-900">{item.name}</Typography>
+                    <Typography className="text-sm text-gray-600">{item.time}</Typography>
+                  </View>
+                </View>
+                <View className="items-end">
+                  <Typography className="font-bold text-blue-600">{item.price}</Typography>
+                  <Typography className="text-xs text-gray-500">{item.distance}</Typography>
+                </View>
+              </TouchableOpacity>
+            </Card>
+          ))}
+        </View>
         {/* Add padding at the bottom for better scrolling experience */}
         <View className="h-6" />
       </ScrollView>

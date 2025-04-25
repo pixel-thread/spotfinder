@@ -7,12 +7,14 @@ import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { useColorScheme } from 'nativewind';
 import { Card } from '../../ui/card';
+import { Ternary } from '../../Ternary';
+import { useMemo } from 'react';
 
 export const ProfileDetail = () => {
   const { user, onLogout: signOut } = useAuth();
   const router = useRouter();
   const { colorScheme } = useColorScheme();
-
+  const isPartner = useMemo(() => user?.role || user?.role === 'PARTNER', [user?.role]);
   return (
     <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="items-center p-6">
@@ -123,6 +125,62 @@ export const ProfileDetail = () => {
           </TouchableOpacity>
         </Card>
       </View>
+      {/* Legal */}
+      {isPartner && (
+        <View className="p-4">
+          <Typography variant="caption" className="mb-2 px-2 text-gray-500">
+            Partner
+          </Typography>
+
+          <Card className="rounded-xl bg-white">
+            <TouchableOpacity
+              className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
+              onPress={() => router.push('/account/help')}>
+              <View className="flex-row items-center">
+                <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
+                  <Ionicons name="help-circle-outline" size={20} color="#3b82f6" />
+                </View>
+                <Typography>View Parking</Typography>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
+              onPress={() => router.push('/account/pricing')}>
+              <View className="flex-row items-center">
+                <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
+                  <Ionicons name="help-circle-outline" size={20} color="#3b82f6" />
+                </View>
+                <Typography>Slot</Typography>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
+              onPress={() => router.push('/account/partner')}>
+              <View className="flex-row items-center">
+                <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
+                  <Ionicons name="help-circle-outline" size={20} color="#3b82f6" />
+                </View>
+                <Typography>Lot</Typography>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="flex-row items-center justify-between p-4"
+              onPress={() => router.push('/account/partner/add-parking')}>
+              <View className="flex-row items-center">
+                <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
+                  <Ionicons name="information-circle-outline" size={20} color="#3b82f6" />
+                </View>
+                <Typography>Add Parking</Typography>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+            </TouchableOpacity>
+          </Card>
+        </View>
+      )}
       {/* Support */}
       <View className="p-4">
         <Typography variant="caption" className="mb-2 px-2 text-gray-500">
@@ -146,7 +204,7 @@ export const ProfileDetail = () => {
             className="flex-row items-center justify-between p-4"
             onPress={() => router.push('/account/about')}>
             <View className="flex-row items-center">
-              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30 dark:bg-blue-950/30">
+              <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                 <Ionicons name="information-circle-outline" size={20} color="#3b82f6" />
               </View>
               <Typography>About</Typography>
@@ -157,12 +215,25 @@ export const ProfileDetail = () => {
       </View>
       {/* Sign Out Button */}
       <View className="p-4">
-        <Button className="bg-red-500" size="lg" onPress={signOut}>
-          <View className="flex-row items-center">
-            <Ionicons name="log-out-outline" size={20} color="white" />
-            <Typography className="ml-2 text-white">Sign Out</Typography>
-          </View>
-        </Button>
+        <Ternary
+          condition={!user}
+          trueComponent={
+            <Button size="lg" onPress={() => router.push('/auth')}>
+              <View className="flex-row items-center">
+                <Ionicons name="log-in-outline" size={20} color="white" />
+                <Typography className="ml-2 text-white">Sign In</Typography>
+              </View>
+            </Button>
+          }
+          falseComponent={
+            <Button className="bg-red-500" size="lg" onPress={signOut}>
+              <View className="flex-row items-center">
+                <Ionicons name="log-out-outline" size={20} color="white" />
+                <Typography className="ml-2 text-white">Sign Out</Typography>
+              </View>
+            </Button>
+          }
+        />
       </View>
       {/* Version Info */}
       <View className="items-center pb-8 pt-2">

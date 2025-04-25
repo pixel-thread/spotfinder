@@ -10,7 +10,7 @@ import { useSubscription } from '~/src/hooks/subscription/useSubscription';
 import { cn } from '~/src/libs';
 
 // add a calculation of discount of 25 percent of the original price
-const PlanCard = () => {
+const PlanCard = ({ parkingId }: { parkingId: string }) => {
   const { user } = useAuth();
   const [selectedSlot, setSelectedSlot] = useState(5);
   const { plan, isLoading, onSubscribe } = useSubscription();
@@ -31,7 +31,9 @@ const PlanCard = () => {
   }, [plan, selectedSlot, DISCOUNT_RATE]);
 
   const handleCheckout = () => {
-    onSubscribe({ slot: selectedSlot });
+    if (selectedSlot && parkingId) {
+      onSubscribe({ slot: selectedSlot, id: parkingId });
+    }
   };
 
   // Show skeleton if loading or essential data is missing
@@ -120,7 +122,7 @@ const PlanCard = () => {
           </View>
         </View>
 
-        <Button size="default" onPress={handleCheckout}>
+        <Button size="default" disabled={!parkingId} onPress={handleCheckout}>
           Buy Now
         </Button>
 

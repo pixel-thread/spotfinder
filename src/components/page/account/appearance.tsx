@@ -1,19 +1,54 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
-import { useState } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, ScrollView, TouchableOpacity, Platform, AppState } from 'react-native';
 
 import { Typography } from '~/src/components/ui/typography';
+import { useAppTheme } from '~/src/hooks/useAppTheme';
 
-type ThemeOption = 'system' | 'light' | 'dark';
 type TextSizeOption = 'small' | 'medium' | 'large';
 
 export const AppearanceSettings = () => {
+  const { setTheme, theme } = useAppTheme();
   const { setColorScheme, colorScheme } = useColorScheme();
-  const [theme, setTheme] = useState<ThemeOption>('system');
   const [textSize, setTextSize] = useState<TextSizeOption>('medium');
   const [reduceMotion, setReduceMotion] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
+
+  // Handle theme changes with iOS-specific logic
+  const applyTheme = (newTheme: 'system' | 'light' | 'dark') => {
+    setTheme(newTheme);
+
+    // For iOS, we need to ensure the colorScheme is applied correctly
+    if (Platform.OS === 'ios') {
+      // Force a re-render on iOS by applying the theme directly
+      if (newTheme === 'system') {
+        setColorScheme('system');
+      } else {
+        setColorScheme(newTheme);
+      }
+    } else {
+      // For Android, the normal behavior works fine
+      setColorScheme(newTheme);
+    }
+  };
+
+  // Listen for app state changes to reapply theme on iOS when app comes to foreground
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      const subscription = AppState.addEventListener('change', (nextAppState) => {
+        if (nextAppState === 'active') {
+          // Reapply the current theme when app becomes active
+          applyTheme(theme);
+        }
+      });
+
+      return () => {
+        subscription.remove();
+      };
+    }
+  }, [theme]);
+
   return (
     <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="p-4">
@@ -35,10 +70,7 @@ export const AppearanceSettings = () => {
               className={`flex-row items-center justify-between border-b border-gray-200 p-4 dark:border-gray-800 ${
                 theme === 'system' ? 'bg-blue-50 dark:bg-blue-950/30' : ''
               }`}
-              onPress={() => {
-                setColorScheme('system');
-                setTheme('system');
-              }}>
+              onPress={() => applyTheme('system')}>
               <View className="flex-row items-center">
                 <Ionicons
                   name="phone-portrait-outline"
@@ -69,10 +101,7 @@ export const AppearanceSettings = () => {
               className={`flex-row items-center justify-between border-b border-gray-200 p-4 dark:border-gray-800 ${
                 theme === 'light' ? 'bg-blue-50 dark:bg-blue-950/30' : ''
               }`}
-              onPress={() => {
-                setColorScheme('light');
-                setTheme('light');
-              }}>
+              onPress={() => applyTheme('light')}>
               <View className="flex-row items-center">
                 <Ionicons
                   name="sunny-outline"
@@ -103,10 +132,7 @@ export const AppearanceSettings = () => {
               className={`flex-row items-center justify-between p-4 ${
                 theme === 'dark' ? 'bg-blue-50 dark:bg-blue-950/30' : ''
               }`}
-              onPress={() => {
-                setColorScheme('dark');
-                setTheme('dark');
-              }}>
+              onPress={() => applyTheme('dark')}>
               <View className="flex-row items-center">
                 <Ionicons
                   name="moon-outline"
