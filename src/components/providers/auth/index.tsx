@@ -11,7 +11,7 @@ import { AuthContextI, UserT } from '~/src/types/auth/context';
 import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
 import { getSkipAuth } from '~/src/utils/storage/auth/skipAuth';
-import { getToken } from '~/src/utils/storage/token';
+import { getToken, removeToken } from '~/src/utils/storage/token';
 import { getUserFromStorage, removeUser, saveUser } from '~/src/utils/storage/user';
 
 type Props = {
@@ -47,6 +47,7 @@ export const AuthProvider = ({ children }: Props) => {
           return userData;
         }
       }
+      removeToken();
       logger.error('User failed to verify');
       setUser(null);
     },
@@ -65,15 +66,16 @@ export const AuthProvider = ({ children }: Props) => {
         logger.info('Skipping Auth');
         return;
       }
-      const userFromStorage = await getUserFromStorage();
 
-      if (userFromStorage) {
-        logger.info('Setting User From Storage');
-        setUser(userFromStorage);
-        logger.info('User Set From Storage');
-        logger.info('Initializing Auth Completed');
-        return;
-      }
+      // const userFromStorage = await getUserFromStorage();
+
+      // if (!userFromStorage) {
+      //   logger.info('Setting User From Storage');
+      //   setUser(userFromStorage);
+      //   logger.info('User Set From Storage');
+      //   logger.info('Initializing Auth Completed');
+      //   return;
+      // }
 
       if (token) {
         mutate();
