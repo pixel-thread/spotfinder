@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, usePathname, useRouter } from 'expo-router';
+import { useSearchParams } from 'expo-router/build/hooks';
 import { useState } from 'react';
 import { View, TextInput, TouchableOpacity } from 'react-native';
-import { ParkingFilter } from '~/src/components/page/parking/parkingFilter';
 
 export default function ParkingLayout() {
   const [searchQuery, setSearchQuery] = useState('');
+  const search = useSearchParams();
+  const isAutoFocusSearch: boolean = search.get('autoFocus') === 'true' || false;
   const pathName = usePathname();
   const router = useRouter();
 
@@ -36,6 +38,7 @@ export default function ParkingLayout() {
             <View className="h-10 flex-1 flex-row items-center rounded-lg bg-gray-100 px-2">
               <Ionicons name="search" size={16} color="#6b7280" />
               <TextInput
+                autoFocus={isAutoFocusSearch}
                 placeholder="Search parking..."
                 className="ml-2 flex-1 text-sm"
                 value={searchQuery}

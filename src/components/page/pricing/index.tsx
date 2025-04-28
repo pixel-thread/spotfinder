@@ -12,8 +12,8 @@ import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import { parkingSchema } from '~/src/utils/validation/parking';
 import { z } from 'zod';
 import { useAuth } from '~/src/hooks/auth/useAuth';
-
-type ParkingDetail = z.infer<typeof parkingSchema>;
+//uat.streamalive.com/l/rating-polls
+https: type ParkingDetail = z.infer<typeof parkingSchema>;
 
 export const Pricing = () => {
   const { user } = useAuth();
@@ -84,6 +84,11 @@ export const Pricing = () => {
                       </Typography>
                       <Typography className="text-sm text-gray-500 dark:text-gray-400">
                         {parking.address || 'No address provided'}
+                      </Typography>
+                    </View>
+                    <View className="flex-1">
+                      <Typography className="text-sm text-gray-500 dark:text-gray-400">
+                        {parking.slots.length || 'No slots available'} Slots
                       </Typography>
                     </View>
                     <View

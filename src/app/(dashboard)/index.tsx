@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'expo-router';
-import { useColorScheme } from 'nativewind';
+import { Link, useRouter } from 'expo-router';
 import { View, ScrollView, TouchableOpacity, Image, Text } from 'react-native';
 import { z } from 'zod';
 
@@ -11,7 +10,10 @@ import { Card } from '~/src/components/ui/card';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
+import { USER_ENDPOINT } from '~/src/libs/endpoints/user';
+import { BookingI } from '~/src/types/booking';
 import http from '~/src/utils/https';
+import { logger } from '~/src/utils/logger';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
 const quickActions = [
@@ -30,37 +32,45 @@ const quickActions = [
   },
 ];
 
-const recentSpots = [
-  { name: 'Downtown Garage', time: 'Yesterday, 5:00 PM', price: '$8.50', distance: '0.3 mi' },
-  { name: 'City Center Lot', time: 'Mon, 2:15 PM', price: '$5.25', distance: '0.8 mi' },
-  { name: 'Harbor View Parking', time: 'Sun, 10:30 AM', price: '$12.00', distance: '1.2 mi' },
-];
-
-const activeParking = [
-  { id: 1, name: 'Downtown Garage', timeLeft: '1h 23m left', spot: 'A-12' },
-  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
-  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
-  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
-  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
-  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
-  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
-  { id: 2, name: 'City Center', timeLeft: '45m left', spot: 'B-08' },
-];
-
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
+const calculateTimeLeft = (startTime: string, endTime: string) => {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  const diff = end.getTime() - start.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  return `${hours}h ${minutes}m`;
+};
+
 const HomePage = () => {
+  const router = useRouter();
   const { user } = useAuth();
   const page = '1';
-  const searchQuery = '';
-  const { data: recentParking } = useQuery({
-    queryKey: ['parking', page, searchQuery],
+
+  const { data: parkingRandom } = useQuery({
+    queryKey: ['parking', page],
     queryFn: () =>
-      http.get<ParkingDetail[]>(
-        PARKING_ENDPOINT.GET_SEARCH_PARKING.replace(':query', searchQuery).replace(':page', page)
+      http.get<Required<ParkingDetail>[]>(
+        PARKING_ENDPOINT.GET_RANDOM_PARKING.replace(':page', page).replace(':limit', '5')
       ),
     select: (data) => data.data,
   });
+
+  const { data: recentBooking } = useQuery({
+    queryKey: ['parking recent booking', page, user],
+    queryFn: () => http.get<BookingI[]>(USER_ENDPOINT.GET_USER_RECENT_BOOKINGS),
+    select: (data) => data.data,
+    enabled: !!user,
+  });
+
+  const { data: bookingHistory } = useQuery({
+    queryKey: ['parking-history', page, user],
+    queryFn: () => http.get<BookingI[]>(USER_ENDPOINT.GET_USER_BOOKING_HISTORY),
+    select: (data) => data.data,
+    enabled: !!user,
+  });
+
   return (
     <Container className="bg-white dark:bg-gray-950">
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
@@ -93,32 +103,37 @@ const HomePage = () => {
           </View>
         </Card>
         {/* Active Parking Section */}
-        {activeParking.length > 0 && (
+        {recentBooking && recentBooking.length > 0 && (
           <View className="mb-6">
-            <Typography className="mb-3 text-lg font-medium">Active Parking</Typography>
+            <Typography className="mb-3 text-lg font-medium">Active Booking</Typography>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {activeParking.map((parking, idx) => (
-                <TouchableOpacity
-                  key={`active-${idx}`}
-                  className="mr-3 w-64 rounded-xl bg-blue-500 p-4">
-                  <View className="flex-row items-center justify-between">
-                    <View className="rounded-full bg-white/20 p-2">
-                      <Ionicons name="time" size={20} color="white" />
+              {recentBooking &&
+                recentBooking.map((parking, idx) => (
+                  <TouchableOpacity
+                    key={`active-${idx}`}
+                    className="mr-3 w-64 rounded-xl bg-blue-500 p-4">
+                    <View className="flex-row items-center justify-between">
+                      <View className="rounded-full bg-white/20 p-2">
+                        <Ionicons name="time" size={20} color="white" />
+                      </View>
+                      <Typography className="font-bold text-white">
+                        {calculateTimeLeft(parking.startTime, parking.endTime)}
+                      </Typography>
                     </View>
-                    <Typography className="font-bold text-white">{parking.timeLeft}</Typography>
-                  </View>
-                  <Typography className="mt-3 text-lg font-bold text-white">
-                    {parking.name}
-                  </Typography>
-                  <View className="mt-2 flex-row items-center">
-                    <Ionicons name="car-outline" size={16} color="white" />
-                    <Typography className="ml-1 text-white">Spot {parking.spot}</Typography>
-                  </View>
-                  <Button className="mt-3 w-full bg-white" size="sm">
-                    <Typography className="text-black dark:text-black">Extend Time</Typography>
-                  </Button>
-                </TouchableOpacity>
-              ))}
+                    <Typography className="mt-3 text-lg font-bold text-white">
+                      {parking.parkingLot.name}
+                    </Typography>
+                    <View className="mt-2 flex-row items-center">
+                      <Ionicons name="car-outline" size={16} color="white" />
+                      <Typography className="ml-1 text-white">
+                        Status: {parking.bookingStatus}
+                      </Typography>
+                    </View>
+                    <Button className="mt-3 w-full bg-white" size="sm">
+                      <Typography className="text-black dark:text-black">Extend Time</Typography>
+                    </Button>
+                  </TouchableOpacity>
+                ))}
             </ScrollView>
           </View>
         )}
@@ -134,7 +149,10 @@ const HomePage = () => {
           <Typography className="mb-3 text-sm text-gray-600">
             Find the perfect spot near your destination
           </Typography>
-          <Button className="w-full bg-blue-600" size="lg">
+          <Button
+            onPress={() => router.replace('/parking/search?autoFocus=true')}
+            className="w-full bg-blue-600"
+            size="lg">
             Find Parking Now
           </Button>
         </View>
@@ -145,8 +163,8 @@ const HomePage = () => {
             New Parking Options
           </Typography>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex flex-row">
-            {recentParking?.map((parking, idx) => (
-              <Link href={`/parking/${parking.id}`} key={parking.id} asChild>
+            {parkingRandom?.map((parking, idx) => (
+              <Link href={`/parking/${parking.id}`} key={parking?.id + idx} asChild>
                 <TouchableOpacity className="mb-4 mr-4 w-64 overflow-hidden rounded-xl bg-white shadow-sm">
                   <Image
                     source={{ uri: parking.image }}
@@ -190,7 +208,7 @@ const HomePage = () => {
 
                     <View className="mt-2 flex-row items-center">
                       <Ionicons name="car-outline" size={16} color="#10b981" />
-                      <Text className="ml-1 text-green-600">{parking.available} spots</Text>
+                      {/* <Text className="ml-1 text-green-600">{parking.available} spots</Text> */}
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -201,27 +219,34 @@ const HomePage = () => {
 
         {/* Recent Spots */}
         <Typography className="mb-4 text-lg font-medium text-gray-800">Recent Spots</Typography>
-        <View className="flex flex-col gap-2">
-          {recentSpots.map((item, index) => (
-            <Card key={`recent-${index}`}>
-              <TouchableOpacity className="mb-3 flex-row items-center justify-between p-4">
-                <View className="flex-row items-center">
-                  <View className="mr-3 rounded-full bg-blue-100 p-2">
-                    <Ionicons name="car" size={22} color="#4c669f" />
-                  </View>
-                  <View>
-                    <Typography className="font-semibold text-gray-900">{item.name}</Typography>
-                    <Typography className="text-sm text-gray-600">{item.time}</Typography>
-                  </View>
-                </View>
-                <View className="items-end">
-                  <Typography className="font-bold text-blue-600">{item.price}</Typography>
-                  <Typography className="text-xs text-gray-500">{item.distance}</Typography>
-                </View>
-              </TouchableOpacity>
-            </Card>
-          ))}
-        </View>
+        {/* <View className="flex flex-col gap-2"> */}
+        {/*   {bookingHistory && */}
+        {/*     bookingHistory.map((item, index) => ( */}
+        {/*       <Card key={`recent-${index}`}> */}
+        {/*         <TouchableOpacity className="mb-3 flex-row items-center justify-between p-4"> */}
+        {/*           <View className="flex-row items-center"> */}
+        {/*             <View className="mr-3 rounded-full bg-blue-100 p-2"> */}
+        {/*               <Ionicons name="car" size={22} color="#4c669f" /> */}
+        {/*             </View> */}
+        {/*             <View> */}
+        {/*               <Typography className="font-semibold text-gray-900"> */}
+        {/*                 {item?.parkingLot.name} */}
+        {/*               </Typography> */}
+        {/*               <Typography className="text-sm text-gray-600"> */}
+        {/*                 {item.startTime.split(' ')[0]}/{item.endTime.split(' ')[0]} */}
+        {/*               </Typography> */}
+        {/*             </View> */}
+        {/*           </View> */}
+        {/*           <View className="items-end"> */}
+        {/*             <Typography className="font-bold text-blue-600"> */}
+        {/*               {item?.parkingLot?.price}/hr */}
+        {/*             </Typography> */}
+        {/*             <Typography className="text-xs text-gray-500">{item.bookingStatus}</Typography> */}
+        {/*           </View> */}
+        {/*         </TouchableOpacity> */}
+        {/*       </Card> */}
+        {/*     ))} */}
+        {/* </View> */}
         {/* Add padding at the bottom for better scrolling experience */}
         <View className="h-6" />
       </ScrollView>

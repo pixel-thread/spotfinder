@@ -1,5 +1,8 @@
 // src/types/booking.ts
 
+import { z } from 'zod';
+import { parkingSchema } from '~/src/utils/validation/parking';
+
 export enum BookingStatus {
   CONFIRMED = 'CONFIRMED',
   CANCELLED = 'CANCELLED',
@@ -20,7 +23,7 @@ export enum PaymentMethod {
   // extend as needed
 }
 
-export interface Booking {
+export interface BookingI {
   id: string;
   userId: string;
   parkingSlotId: string;
@@ -39,4 +42,5 @@ export interface Booking {
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
   cancelledAt: string | null; // ISO timestamp if cancelled, otherwise null
+  parkingLot: z.infer<typeof parkingSchema>;
 }

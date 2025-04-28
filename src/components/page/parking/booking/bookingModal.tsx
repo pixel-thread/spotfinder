@@ -97,6 +97,7 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
     if (user) {
       mutate();
     }
+    onClose();
     router.push('/auth');
   };
   // If loading, show skeleton UI
