@@ -1,6 +1,7 @@
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
@@ -15,6 +16,8 @@ import http from '~/src/utils/https';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import { z } from 'zod';
 import { toast } from '~/src/components/ui/toast';
+import { useImagePicker } from '~/src/hooks/useImagePicker';
+import { writeFile } from 'fs/promises';
 
 type FormInput = z.infer<typeof parkingSchema>;
 
@@ -27,6 +30,9 @@ const amenityOptions = [
 export const AddParkingForm = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const [images, setImages] = useState<string[]>([]);
+  const { pickImage, hasPermission } = useImagePicker();
+
   const form = useForm<FormInput>({
     resolver: zodResolver(parkingSchema),
     defaultValues: {
@@ -43,7 +49,13 @@ export const AddParkingForm = () => {
 
   const { mutate, isPending } = useMutation({
     mutationKey: ['parking'],
-    mutationFn: (data: FormInput) => http.post(PARKING_ENDPOINT.POST_ADD_PARKING, data),
+    mutationFn: (data: FormInput) =>
+      http.post(PARKING_ENDPOINT.POST_ADD_PARKING, data, {
+        headers: {
+          Accept: 'multipart/form-data',
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
     onSuccess: (data) => {
       if (data.success) {
         toast.success(data.message);
@@ -56,6 +68,25 @@ export const AddParkingForm = () => {
 
   // Add a submit handler that includes the userId
   const onSubmit: SubmitHandler<FormInput> = (data) => mutate(data);
+
+  const handlePickImage = async () => {
+    const assets = await pickImage({
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+      allowsMultipleSelection: true,
+    });
+
+    if (assets) {
+      const newImages = assets.map((asset) => asset.uri);
+      setImages((prev) => [...prev, ...newImages]);
+
+      // Update form value
+      const currentGallery = form.getValues('gallery') || [];
+      form.setValue('gallery', [...currentGallery, ...newImages]);
+    }
+  };
+
   return (
     <View className="px-4 py-6">
       <Typography variant="heading" className="text-center text-2xl">
@@ -64,7 +95,6 @@ export const AddParkingForm = () => {
       <Typography variant="body" className="mt-2 text-center text-gray-600">
         List your parking space and start earning
       </Typography>
-
       {/* Basic Information */}
       <View className="mt-6">
         <Typography variant="caption" className="mb-3 font-semibold text-gray-800">
@@ -145,8 +175,6 @@ export const AddParkingForm = () => {
           </View>
         </View>
       </View>
-
-      {/* Pricing */}
       <View className="mt-6">
         <Typography variant="caption" className="mb-3 font-semibold text-gray-800">
           Pricing
@@ -173,7 +201,6 @@ export const AddParkingForm = () => {
           />
         </View>
       </View>
-
       {/* Description */}
       <View className="mt-6">
         <Typography variant="caption" className="mb-3 font-semibold text-gray-800">
@@ -200,7 +227,6 @@ export const AddParkingForm = () => {
           />
         </View>
       </View>
-
       {/* Amenities */}
       <View className="mt-6">
         <Typography variant="caption" className="mb-3 font-semibold text-gray-800">
@@ -243,21 +269,44 @@ export const AddParkingForm = () => {
           ))}
         </View>
       </View>
-
-      {/* Photos */}
       <View className="mt-6">
         <Typography variant="caption" className="mb-3 font-semibold text-gray-800">
           Photos
         </Typography>
+        {/* Display selected images */}
+        {images.length > 0 && (
+          <View className="mb-4 flex-row flex-wrap gap-2">
+            {images.map((uri, index) => (
+              <View key={index} className="relative h-24 w-24 overflow-hidden rounded-md">
+                <Image source={{ uri }} className="h-full w-full" />
+                <TouchableOpacity
+                  className="absolute right-1 top-1 rounded-full bg-black/50 p-1"
+                  onPress={() => {
+                    const newImages = images.filter((_, i) => i !== index);
+                    setImages(newImages);
+                    form.setValue('gallery', newImages);
+                  }}>
+                  <Ionicons name="close" size={16} color="white" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
 
         <TouchableOpacity
           className="flex h-32 items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50"
-          onPress={() => console.log('Add photo')}>
+          onPress={handlePickImage}>
           <Ionicons name="camera-outline" size={32} color="#6b7280" />
-          <Typography className="mt-2 text-sm text-gray-600">Add Photos</Typography>
+          <Typography className="mt-2 text-sm text-gray-600">
+            {images.length > 0 ? 'Add More Photos' : 'Add Photos'}
+          </Typography>
+          {hasPermission === false && (
+            <Typography className="mt-1 text-xs text-red-500">
+              Permission needed to access photos
+            </Typography>
+          )}
         </TouchableOpacity>
       </View>
-
       {/* Submit Button */}
       <View className="mt-8">
         <Button disabled={isPending} size="lg" onPress={form.handleSubmit(onSubmit)}>

@@ -13,7 +13,6 @@ import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import { USER_ENDPOINT } from '~/src/libs/endpoints/user';
 import { BookingI } from '~/src/types/booking';
 import http from '~/src/utils/https';
-import { logger } from '~/src/utils/logger';
 import { parkingSchema } from '~/src/utils/validation/parking';
 
 const quickActions = [
