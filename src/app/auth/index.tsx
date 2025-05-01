@@ -1,66 +1,58 @@
-import { Link } from 'expo-router';
-import { View, Text, ImageBackground } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { View, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 
 import { Container } from '~/src/components/Container';
 import { LoginForm } from '~/src/components/page/auth/login-form';
-import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
-import { saveSkipAuth } from '~/src/utils/storage/auth/skipAuth';
 
 export default function LoginPage() {
-  const onPressSkip = async () => {
-    return await saveSkipAuth(true);
-  };
-
   return (
-    <Container className="flex-1 justify-center bg-white px-4">
-      {/* Background Image */}
-      <ImageBackground
-        source={{ uri: 'https://example.com/background-image.jpg' }} // Replace with a real image URL
-        className="absolute inset-0"
-        resizeMode="cover"
-        style={{ opacity: 0.3 }}
-        imageClassName="bg-gray-200"
-      />
+    <>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 40}>
+        <Container className="flex h-full">
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled">
+            {/* Hero section with image */}
+            <View className="h-[50%] overflow-hidden">
+              <Image
+                source={require('../../../assets/login/login-image.jpg')}
+                className="h-full w-full"
+                resizeMode="cover"
+              />
+              <View className="absolute bottom-0 h-28 w-full bg-gradient-to-t from-white to-transparent" />
 
-      <View className="flex w-full max-w-md flex-col gap-6 self-center rounded-lg bg-white p-6 shadow-lg">
-        {/* Header */}
-        <View className="space-y-2">
-          <Typography variant="heading" className="text-center text-3xl font-bold text-blue-800">
-            Welcome Back
-          </Typography>
-          <Typography variant="caption" className="text-center text-gray-600">
-            Sign in to continue to your account
-          </Typography>
-        </View>
+              {/* Logo overlay */}
+              <View className="absolute bottom-8 left-0 right-0 items-center">
+                <View className="rounded-full bg-white/90 p-3 shadow-lg">
+                  <Ionicons name="car" size={40} color="#3b82f6" />
+                </View>
+              </View>
+            </View>
 
-        {/* Login Form */}
-        <LoginForm />
+            <View className="flex flex-col gap-6 px-6 pt-8">
+              <View className="flex flex-col gap-2">
+                <Typography
+                  variant="heading"
+                  className="text-center text-3xl font-bold text-gray-900">
+                  Welcome to ParkEase
+                </Typography>
+                <Typography className="text-center text-gray-600" variant="caption">
+                  Find and book parking spots with ease. Enter your phone number to continue.
+                </Typography>
+              </View>
 
-        <View className="flex-row items-center justify-center space-x-1">
-          <Typography variant="body" className="text-gray-600">
-            or
-          </Typography>
-        </View>
-
-        {/* Footer Link */}
-        <View className="flex-row items-center justify-center space-x-1">
-          <Text className="text-sm text-gray-600">Don't have an account?</Text>
-          <Link href="/auth/register" asChild>
-            <Button variant="link" size="sm">
-              Sign Up
-            </Button>
-          </Link>
-        </View>
-        {/* Footer Link */}
-        <View className="flex-row items-center justify-center space-x-1">
-          <Link href="/" replace onPress={onPressSkip} asChild>
-            <Button variant="secondary" size="sm">
-              Continue without login
-            </Button>
-          </Link>
-        </View>
-      </View>
-    </Container>
+              <View className="mt-4">
+                <LoginForm />
+              </View>
+            </View>
+          </ScrollView>
+        </Container>
+      </KeyboardAvoidingView>
+    </>
   );
 }

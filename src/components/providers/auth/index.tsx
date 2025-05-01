@@ -12,7 +12,7 @@ import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
 import { getSkipAuth } from '~/src/utils/storage/auth/skipAuth';
 import { getToken, removeToken } from '~/src/utils/storage/token';
-import { getUserFromStorage, removeUser, saveUser } from '~/src/utils/storage/user';
+import { removeUser, saveUser } from '~/src/utils/storage/user';
 
 type Props = {
   children: Readonly<React.ReactNode>;
@@ -59,22 +59,6 @@ export const AuthProvider = ({ children }: Props) => {
   const verifyUser = async () => {
     try {
       const token = await getToken();
-      const isSkipLogin = await getSkipAuth();
-      if (isSkipLogin && !token) {
-        logger.info('Skipping Auth');
-        return;
-      }
-
-      // const userFromStorage = await getUserFromStorage();
-
-      // if (!userFromStorage) {
-      //   logger.info('Setting User From Storage');
-      //   setUser(userFromStorage);
-      //   logger.info('User Set From Storage');
-      //   logger.info('Initializing Auth Completed');
-      //   return;
-      // }
-
       if (token) {
         mutate();
         logger.info('Getting User From Token');

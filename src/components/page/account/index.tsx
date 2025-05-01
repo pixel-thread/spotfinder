@@ -10,11 +10,16 @@ import { Card } from '../../ui/card';
 import { Ternary } from '../../Ternary';
 import { useMemo } from 'react';
 
-export const ProfileDetail = () => {
+export const Account = () => {
   const { user, onLogout: signOut } = useAuth();
   const router = useRouter();
   const { colorScheme } = useColorScheme();
-  const isPartner = useMemo(() => user?.role || user?.role === 'PARTNER', [user?.role]);
+
+  const isPartner = useMemo(
+    () => user?.role === 'PARTNER' || user?.role === 'SUPER_ADMIN',
+    [user?.role]
+  );
+
   return (
     <ScrollView className="flex-1 bg-white dark:bg-gray-950">
       <View className="items-center p-6">

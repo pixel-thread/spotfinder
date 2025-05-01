@@ -1,4 +1,4 @@
-import { usePathname, useRouter } from 'expo-router';
+import { usePathname, useRouter, Route } from 'expo-router';
 import React, { useEffect, useMemo } from 'react';
 
 import { SplashScreen } from '../../SplashScreen';
@@ -9,7 +9,7 @@ import { logger } from '~/src/utils/logger';
 
 // Define roles and route access
 type RoleRoute = {
-  url: string;
+  url: Route;
   role: RoleT[];
   needAuth?: boolean;
 };
@@ -17,27 +17,42 @@ type RoleRoute = {
 const routeRoles: RoleRoute[] = [
   {
     url: '/pricing',
-    role: ['SUPERADMIN', 'USER', 'PARTNER'],
-    needAuth: false,
+    role: ['SUPER_ADMIN', 'USER', 'PARTNER'],
+    needAuth: true,
   },
   {
-    url: '/profile',
-    role: ['SUPERADMIN', 'USER', 'PARTNER'],
-    needAuth: false,
+    url: '/account',
+    role: ['SUPER_ADMIN', 'USER', 'PARTNER'],
+    needAuth: true,
+  },
+  {
+    url: '/account/partner',
+    role: ['SUPER_ADMIN', 'PARTNER'],
+    needAuth: true,
+  },
+  {
+    url: '/account/partner/add-parking',
+    role: ['SUPER_ADMIN', 'PARTNER'],
+    needAuth: true,
+  },
+  {
+    url: '/pricing',
+    role: ['USER', 'PARTNER'],
+    needAuth: true,
   },
   {
     url: '/',
-    role: ['USER', 'PARTNER', 'SUPERADMIN'],
-    needAuth: false,
+    role: ['USER', 'PARTNER', 'SUPER_ADMIN'],
+    needAuth: true,
   },
   {
     url: '/parking',
-    role: ['USER', 'PARTNER', 'SUPERADMIN'],
-    needAuth: false,
+    role: ['USER', 'PARTNER', 'SUPER_ADMIN'],
+    needAuth: true,
   },
 ];
 
-const unauthOnlyPages = ['/auth', '/auth/register'];
+const unauthOnlyPages: Route[] = ['/auth', '/auth/register'];
 
 type Props = {
   children: React.ReactNode;
@@ -48,7 +63,7 @@ export const AuthGuard = ({ children }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isAuthenticated = !!user;
+  const isAuthenticated: boolean = !!user;
   const userRole = useMemo(() => user?.role ?? 'USER', [user]);
 
   // Route access control
@@ -87,7 +102,7 @@ export const AuthGuard = ({ children }: Props) => {
   // Prevent logged-in users from accessing guest-only pages
   useEffect(() => {
     if (isAuthLoading) return;
-    if (isAuthenticated && unauthOnlyPages.includes(pathname)) {
+    if (isAuthenticated && unauthOnlyPages.includes(pathname as Route)) {
       router.replace('/');
     }
   }, [pathname, isAuthenticated, isAuthLoading]);

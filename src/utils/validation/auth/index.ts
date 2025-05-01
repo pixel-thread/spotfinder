@@ -1,5 +1,4 @@
 import z from 'zod';
-import { passwordValidation } from '../passwordValidation';
 
 export const loginSchema = z.object({
   phone: z
@@ -11,5 +10,6 @@ export const loginSchema = z.object({
     })
     .max(10, 'Phone number must be 10 digits')
     .regex(/^[0-9]+$/, 'Phone number must be numeric'),
-  password: passwordValidation,
+  // password: passwordValidation,
+  otp: z.string().min(5, 'OTP is Required').max(5, 'OTP is Required').optional(), // otp is required
 });
