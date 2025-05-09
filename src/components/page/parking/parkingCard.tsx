@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from 'nativewind';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { z } from 'zod';
 
@@ -7,7 +8,6 @@ import { Typography } from '../../ui/typography';
 
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { parkingSchema } from '~/src/utils/validation/parking';
-import { useColorScheme } from 'nativewind';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 

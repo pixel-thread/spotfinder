@@ -2,6 +2,7 @@
   "expo": {
     "name": "ParkEase",
     "slug": "parking",
+    "jsEngine": "jsc",
     "version": "1.0.0",
     "scheme": "parking",
     "web": {
@@ -14,7 +15,9 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "The app accesses your photos to let you share them with your friends.",
+          "cameraPermission": "The app accesses your photos to let you share them with your friends.",
+          "microphonePermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
     ],

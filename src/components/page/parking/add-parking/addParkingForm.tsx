@@ -1,7 +1,8 @@
+import * as ImagePicker from 'expo-image-picker';
 import { View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
@@ -16,8 +17,6 @@ import http from '~/src/utils/https';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import { z } from 'zod';
 import { toast } from '~/src/components/ui/toast';
-import { useImagePicker } from '~/src/hooks/useImagePicker';
-import { writeFile } from 'fs/promises';
 
 type FormInput = z.infer<typeof parkingSchema>;
 
@@ -27,11 +26,40 @@ const amenityOptions = [
   { id: 'charging', label: 'EV Charging', icon: 'flash-outline' },
   { id: 'cctv', label: 'CCTV', icon: 'videocam-outline' },
 ];
+
 export const AddParkingForm = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [images, setImages] = useState<string[]>([]);
-  const { pickImage, hasPermission } = useImagePicker();
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+
+  // Request permission on mount
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  const handlePickImage = async () => {
+    if (hasPermission === false) {
+      alert('Permission to access media library is required!');
+      return;
+    }
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uris = result.assets.map((asset) => asset.uri);
+      const newImages = [...images, ...uris];
+      setImages(newImages);
+      form.setValue('gallery', newImages);
+    }
+  };
 
   const form = useForm<FormInput>({
     resolver: zodResolver(parkingSchema),
@@ -68,24 +96,6 @@ export const AddParkingForm = () => {
 
   // Add a submit handler that includes the userId
   const onSubmit: SubmitHandler<FormInput> = (data) => mutate(data);
-
-  const handlePickImage = async () => {
-    const assets = await pickImage({
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-      allowsMultipleSelection: true,
-    });
-
-    if (assets) {
-      const newImages = assets.map((asset) => asset.uri);
-      setImages((prev) => [...prev, ...newImages]);
-
-      // Update form value
-      const currentGallery = form.getValues('gallery') || [];
-      form.setValue('gallery', [...currentGallery, ...newImages]);
-    }
-  };
 
   return (
     <View className="px-4 py-6">
