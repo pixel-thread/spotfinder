@@ -1,4 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
+
 import { View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -17,20 +18,34 @@ import http from '~/src/utils/https';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import { z } from 'zod';
 import { toast } from '~/src/components/ui/toast';
+import { logger } from '~/src/utils/logger';
 
 type FormInput = z.infer<typeof parkingSchema>;
 
-const amenityOptions = [
+type Amenity = {
+  id: string;
+  label: string;
+  icon?: string;
+};
+
+type ImageI = {
+  uri: string;
+  name: string | null | undefined;
+  type: 'image' | 'video' | 'livePhoto' | 'pairedVideo' | undefined;
+};
+const amenityOptions: Amenity[] = [
   { id: 'security', label: 'Security', icon: 'shield-checkmark-outline' },
   { id: 'covered', label: 'Covered', icon: 'umbrella-outline' },
   { id: 'charging', label: 'EV Charging', icon: 'flash-outline' },
   { id: 'cctv', label: 'CCTV', icon: 'videocam-outline' },
+  { id: 'WiFi', label: 'WiFi', icon: 'wifi-outline' },
+  { id: 'Washroom', label: 'Washroom', icon: '' },
 ];
 
 export const AddParkingForm = () => {
   const { user } = useAuth();
-  const router = useRouter();
-  const [images, setImages] = useState<string[]>([]);
+  const [image, setImage] = useState<ImageI | null>(null); // Store a single image object or null
+  const [parkingId, setParkingId] = useState<string>('bc8bdc32-5378-469d-84e1-1206f110f613');
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   // Request permission on mount
@@ -41,6 +56,22 @@ export const AddParkingForm = () => {
     })();
   }, []);
 
+  const { mutate: onUpload } = useMutation({
+    mutationFn: (data: FormData) =>
+      http.put(PARKING_ENDPOINT.POST_ADD_PARKING_IMAGE.replace(':id', parkingId), data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+
   const handlePickImage = async () => {
     if (hasPermission === false) {
       alert('Permission to access media library is required!');
@@ -48,49 +79,63 @@ export const AddParkingForm = () => {
     }
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
+      selectionLimit: 1, // single image
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      const uris = result.assets.map((asset) => asset.uri);
-      const newImages = [...images, ...uris];
-      setImages(newImages);
-      form.setValue('gallery', newImages);
+      const asset = result.assets[0];
+      setImage({
+        uri: asset.uri,
+        name: asset.fileName || asset.uri.split('/').pop() || 'photo.jpg',
+        type: 'image',
+      });
     }
   };
 
-  const form = useForm<FormInput>({
+  const form = useForm({
     resolver: zodResolver(parkingSchema),
     defaultValues: {
-      features: [], // string array for amenities
-      userId: user?.id, // Add userId from auth
-      image: `https://picsum.photos/seed/seed${Math.floor(Math.random() * 100)}/300/200`,
-      gallery: Array(Math.floor(Math.random() * 3) + 1)
-        .fill(0)
-        .map(
-          (_, j) => `https://picsum.photos/seed/seed${Math.floor(Math.random() * 100) + j}/300/200`
-        ),
+      name: '',
+      price: '',
+      description: '',
+      features: '',
+      userId: user?.id || '',
+      address: '',
+      openHours: '',
+      distance: '',
+      pinCode: '',
+      rating: [],
     },
   });
 
   const { mutate, isPending } = useMutation({
     mutationKey: ['parking'],
     mutationFn: (data: FormInput) =>
-      http.post(PARKING_ENDPOINT.POST_ADD_PARKING, data, {
-        headers: {
-          Accept: 'multipart/form-data',
-          'Content-Type': 'multipart/form-data',
-        },
-      }),
+      http.post<{ id: string }>(PARKING_ENDPOINT.POST_ADD_PARKING, data),
     onSuccess: (data) => {
       if (data.success) {
         toast.success(data.message);
-        router.push('/account/partner');
-        return data?.data;
+        if (data?.data?.id) {
+          setParkingId(data?.data?.id);
+
+          // Upload images if available
+          if (image) {
+            const formData = new FormData();
+            formData.append('image', {
+              uri: image.uri,
+              name: image.name,
+              type: image.type,
+            } as any);
+
+            onUpload(formData); // Upload images after parking space is created
+          }
+        }
+      } else {
+        toast.error(data.message);
       }
-      toast.error(data.message);
     },
   });
 
@@ -237,46 +282,29 @@ export const AddParkingForm = () => {
           />
         </View>
       </View>
-      {/* Amenities */}
       <View className="mt-6">
         <Typography variant="caption" className="mb-3 font-semibold text-gray-800">
-          Amenities
+          Feature
         </Typography>
-        <View className="flex-row flex-wrap gap-3">
-          {amenityOptions.map((amenity) => (
-            <Controller
-              key={amenity.id}
-              control={form.control}
-              name="features"
-              render={({ field: { value, onChange } }) => {
-                const checked = Array.isArray(value) && value.includes(amenity.id);
-                return (
-                  <TouchableOpacity
-                    className={cn(
-                      'flex-row items-center rounded-full border px-3 py-2',
-                      checked ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    )}
-                    onPress={() => {
-                      if (checked) {
-                        onChange(value.filter((f: string) => f !== amenity.id));
-                      } else {
-                        onChange([...(value || []), amenity.id]);
-                      }
-                    }}>
-                    <Ionicons
-                      name={amenity.icon as any}
-                      size={16}
-                      color={checked ? '#3b82f6' : '#6b7280'}
-                    />
-                    <Typography
-                      className={cn('ml-1 text-sm', checked ? 'text-blue-700' : 'text-gray-700')}>
-                      {amenity.label}
-                    </Typography>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-          ))}
+        <View className="mb-4">
+          <Typography className="mb-1 text-sm font-medium text-gray-700">
+            Tell users about your parking space
+          </Typography>
+          <Controller
+            control={form.control}
+            name="features" // Changed from "address" to "description"
+            render={({ field: { onChange, value, ...field } }) => (
+              <Input
+                {...field}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900"
+                placeholder="Describe your parking space..."
+                error={form.formState.errors.description?.message}
+                textAlignVertical="top"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+          />
         </View>
       </View>
       <View className="mt-6">
@@ -284,22 +312,16 @@ export const AddParkingForm = () => {
           Photos
         </Typography>
         {/* Display selected images */}
-        {images.length > 0 && (
+        {image && (
           <View className="mb-4 flex-row flex-wrap gap-2">
-            {images.map((uri, index) => (
-              <View key={index} className="relative h-24 w-24 overflow-hidden rounded-md">
-                <Image source={{ uri }} className="h-full w-full" />
-                <TouchableOpacity
-                  className="absolute right-1 top-1 rounded-full bg-black/50 p-1"
-                  onPress={() => {
-                    const newImages = images.filter((_, i) => i !== index);
-                    setImages(newImages);
-                    form.setValue('gallery', newImages);
-                  }}>
-                  <Ionicons name="close" size={16} color="white" />
-                </TouchableOpacity>
-              </View>
-            ))}
+            <View className="relative h-24 w-24 overflow-hidden rounded-md">
+              <Image source={{ uri: image.uri }} className="h-full w-full" />
+              <TouchableOpacity
+                className="absolute right-1 top-1 rounded-full bg-black/50 p-1"
+                onPress={() => setImage(null)}>
+                <Ionicons name="close" size={16} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
 
@@ -308,7 +330,7 @@ export const AddParkingForm = () => {
           onPress={handlePickImage}>
           <Ionicons name="camera-outline" size={32} color="#6b7280" />
           <Typography className="mt-2 text-sm text-gray-600">
-            {images.length > 0 ? 'Add More Photos' : 'Add Photos'}
+            {image ? 'Add More Photos' : 'Add Photos'}
           </Typography>
           {hasPermission === false && (
             <Typography className="mt-1 text-xs text-red-500">
@@ -320,7 +342,7 @@ export const AddParkingForm = () => {
       {/* Submit Button */}
       <View className="mt-8">
         <Button disabled={isPending} size="lg" onPress={form.handleSubmit(onSubmit)}>
-          List Parking Space
+          Add Parking
         </Button>
       </View>
     </View>

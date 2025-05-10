@@ -1,23 +1,18 @@
 {
   "expo": {
-    "name": "ParkEase",
-    "slug": "parking",
-    "jsEngine": "jsc",
+    "name": "Spot Finder",
+    "slug": "spotfinder",
+    "jsEngine": "hermes",
     "version": "1.0.0",
     "scheme": "parking",
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/favicon.png"
-    },
     "plugins": [
       "expo-router",
       [
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends.",
-          "cameraPermission": "The app accesses your photos to let you share them with your friends.",
-          "microphonePermission": "The app accesses your photos to let you share them with your friends."
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to let you ...",
+          "microphonePermission": false
         }
       ]
     ],
@@ -35,7 +30,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.jyrwaboys.parking"
     },
     "android": {
