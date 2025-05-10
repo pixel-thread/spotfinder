@@ -1,19 +1,19 @@
-import { SubmitHandler, useForm, Form, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema } from '~/src/utils/validation/auth';
 import { useMutation } from '@tanstack/react-query';
-import http from '~/src/utils/https';
+import React, { useEffect } from 'react';
+import { SubmitHandler, useForm, Controller, useWatch } from 'react-hook-form';
+import { View } from 'react-native';
+
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
+import { toast } from '../../ui/toast';
+
+import { useAuth } from '~/src/hooks/auth/useAuth';
 import { AUTH_ENDPOINT } from '~/src/libs/endpoints/auth';
+import http from '~/src/utils/https';
 import { logger } from '~/src/utils/logger';
 import { saveToken } from '~/src/utils/storage/token';
-import { useAuth } from '~/src/hooks/auth/useAuth';
-
-import { toast } from '../../ui/toast';
-import { Input } from '../../ui/input';
-import { View } from 'react-native';
-import { Button } from '../../ui/button';
-import React, { useEffect } from 'react';
-import { Typography } from '../../ui/typography';
+import { loginSchema } from '~/src/utils/validation/auth';
 
 type FormValue = {
   phone: string;
@@ -33,7 +33,6 @@ export const LoginForm = () => {
     defaultValues: {
       phone: '',
     },
-    mode: 'onTouched',
   });
 
   const watchPhone = useWatch({
@@ -60,7 +59,6 @@ export const LoginForm = () => {
     onSuccess: async (data) => {
       if (data.success) {
         if (data.token) {
-          console.log(data.token);
           logger.info('Saving Token');
           await saveToken(data.token);
           logger.info('Token Saved');

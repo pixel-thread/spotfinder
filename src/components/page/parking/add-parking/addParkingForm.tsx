@@ -1,15 +1,10 @@
-import * as ImagePicker from 'expo-image-picker';
-
 import { View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
 
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
-import { cn } from '~/src/libs';
 import { Input } from '~/src/components/ui/input';
-import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parkingSchema } from '~/src/utils/validation/parking';
 import { useAuth } from '~/src/hooks/auth/useAuth';
@@ -18,47 +13,17 @@ import http from '~/src/utils/https';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import { z } from 'zod';
 import { toast } from '~/src/components/ui/toast';
-import { logger } from '~/src/utils/logger';
+import { useImagePicker } from '~/src/hooks/useImagePicker';
 
 type FormInput = z.infer<typeof parkingSchema>;
 
-type Amenity = {
-  id: string;
-  label: string;
-  icon?: string;
-};
-
-type ImageI = {
-  uri: string;
-  name: string | null | undefined;
-  type: 'image' | 'video' | 'livePhoto' | 'pairedVideo' | undefined;
-};
-const amenityOptions: Amenity[] = [
-  { id: 'security', label: 'Security', icon: 'shield-checkmark-outline' },
-  { id: 'covered', label: 'Covered', icon: 'umbrella-outline' },
-  { id: 'charging', label: 'EV Charging', icon: 'flash-outline' },
-  { id: 'cctv', label: 'CCTV', icon: 'videocam-outline' },
-  { id: 'WiFi', label: 'WiFi', icon: 'wifi-outline' },
-  { id: 'Washroom', label: 'Washroom', icon: '' },
-];
-
 export const AddParkingForm = () => {
   const { user } = useAuth();
-  const [image, setImage] = useState<ImageI | null>(null); // Store a single image object or null
-  const [parkingId, setParkingId] = useState<string>('bc8bdc32-5378-469d-84e1-1206f110f613');
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const { image, hasPermission, pickFromLibrary, clearImage } = useImagePicker();
 
-  // Request permission on mount
-  useEffect(() => {
-    (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  const { mutate: onUpload } = useMutation({
-    mutationFn: (data: FormData) =>
-      http.put(PARKING_ENDPOINT.POST_ADD_PARKING_IMAGE.replace(':id', parkingId), data, {
+  const { mutate: onUpload, isPending: isUploading } = useMutation({
+    mutationFn: ({ data, id }: { data: FormData; id: string }) =>
+      http.put(PARKING_ENDPOINT.PUT_ADD_PARKING_IMAGE.replace(':id', id), data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -72,43 +37,10 @@ export const AddParkingForm = () => {
     },
   });
 
-  const handlePickImage = async () => {
-    if (hasPermission === false) {
-      alert('Permission to access media library is required!');
-      return;
-    }
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-      selectionLimit: 1, // single image
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const asset = result.assets[0];
-      setImage({
-        uri: asset.uri,
-        name: asset.fileName || asset.uri.split('/').pop() || 'photo.jpg',
-        type: 'image',
-      });
-    }
-  };
-
   const form = useForm({
     resolver: zodResolver(parkingSchema),
-    defaultValues: {
-      name: '',
-      price: '',
-      description: '',
-      features: '',
-      userId: user?.id || '',
-      address: '',
-      openHours: '',
-      distance: '',
-      pinCode: '',
-      rating: [],
-    },
+    defaultValues: { userId: user?.id || '' },
+    mode: 'all',
   });
 
   const { mutate, isPending } = useMutation({
@@ -117,21 +49,15 @@ export const AddParkingForm = () => {
       http.post<{ id: string }>(PARKING_ENDPOINT.POST_ADD_PARKING, data),
     onSuccess: (data) => {
       if (data.success) {
-        toast.success(data.message);
-        if (data?.data?.id) {
-          setParkingId(data?.data?.id);
-
-          // Upload images if available
-          if (image) {
-            const formData = new FormData();
-            formData.append('image', {
-              uri: image.uri,
-              name: image.name,
-              type: image.type,
-            } as any);
-
-            onUpload(formData); // Upload images after parking space is created
-          }
+        const parking = data.data;
+        if (parking?.id && image) {
+          const formData = new FormData();
+          formData.append('image', {
+            uri: image.uri,
+            name: image.name,
+            type: image.type,
+          } as any);
+          onUpload({ data: formData, id: parking.id }); // Upload images after parking space is created
         }
       } else {
         toast.error(data.message);
@@ -197,15 +123,15 @@ export const AddParkingForm = () => {
             <Typography className="mb-1 text-sm font-medium text-gray-700">City</Typography>
             <Controller
               control={form.control}
-              name="address"
+              name="city"
               render={({ field: { onChange, value, ...field } }) => (
                 <Input
                   className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900"
-                  placeholder="Address"
+                  placeholder="City"
                   {...field}
                   value={value}
                   onChangeText={onChange}
-                  error={form.formState.errors.address?.message}
+                  error={form.formState.errors.city?.message}
                 />
               )}
             />
@@ -292,7 +218,7 @@ export const AddParkingForm = () => {
           </Typography>
           <Controller
             control={form.control}
-            name="features" // Changed from "address" to "description"
+            name="features"
             render={({ field: { onChange, value, ...field } }) => (
               <Input
                 {...field}
@@ -312,36 +238,36 @@ export const AddParkingForm = () => {
           Photos
         </Typography>
         {/* Display selected images */}
-        {image && (
+        {image ? (
           <View className="mb-4 flex-row flex-wrap gap-2">
-            <View className="relative h-24 w-24 overflow-hidden rounded-md">
+            <View className="relative aspect-square w-full overflow-hidden rounded-md">
               <Image source={{ uri: image.uri }} className="h-full w-full" />
               <TouchableOpacity
                 className="absolute right-1 top-1 rounded-full bg-black/50 p-1"
-                onPress={() => setImage(null)}>
+                onPress={() => clearImage()}>
                 <Ionicons name="close" size={16} color="white" />
               </TouchableOpacity>
             </View>
           </View>
-        )}
-
-        <TouchableOpacity
-          className="flex h-32 items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50"
-          onPress={handlePickImage}>
-          <Ionicons name="camera-outline" size={32} color="#6b7280" />
-          <Typography className="mt-2 text-sm text-gray-600">
-            {image ? 'Add More Photos' : 'Add Photos'}
-          </Typography>
-          {hasPermission === false && (
-            <Typography className="mt-1 text-xs text-red-500">
-              Permission needed to access photos
+        ) : (
+          <TouchableOpacity
+            className="flex h-32 items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50"
+            onPress={pickFromLibrary}>
+            <Ionicons name="camera-outline" size={32} color="#6b7280" />
+            <Typography className="mt-2 text-sm text-gray-600">
+              {image ? 'Add More Photos' : 'Add Photos'}
             </Typography>
-          )}
-        </TouchableOpacity>
+            {hasPermission === false && (
+              <Typography className="mt-1 text-xs text-red-500">
+                Permission needed to access photos
+              </Typography>
+            )}
+          </TouchableOpacity>
+        )}
       </View>
       {/* Submit Button */}
       <View className="mt-8">
-        <Button disabled={isPending} size="lg" onPress={form.handleSubmit(onSubmit)}>
+        <Button disabled={isPending || isUploading} size="lg" onPress={form.handleSubmit(onSubmit)}>
           Add Parking
         </Button>
       </View>

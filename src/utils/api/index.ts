@@ -3,7 +3,7 @@ import axios from 'axios';
 import { getToken } from '../storage/token';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000/api/v1',
+  baseURL: 'https://jyrwa-parkingi.vercel.app/api/v1',
   timeout: 10000,
 });
 
