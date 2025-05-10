@@ -1,39 +1,61 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+type ImageI = {
+  uri: string;
+  name: string | null | undefined;
+  type: 'image' | 'video' | 'livePhoto' | 'pairedVideo' | undefined;
+};
 
 type PickerResult = {
-  uri: string;
+  image: ImageI | null | ImagePicker.ImagePickerAsset;
   cancelled: boolean;
   error?: string;
 };
 
 export function useImagePicker() {
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<ImageI | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
   const pickFromLibrary = async (): Promise<PickerResult> => {
+    if (!hasPermission) {
+      return { image: null, cancelled: true, error: 'Permission to access gallery was denied' };
+    }
+
     setError(null);
 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       const msg = 'Permission to access gallery was denied';
       setError(msg);
-      return { uri: '', cancelled: true, error: msg };
+      return { image: null, cancelled: true, error: msg };
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
+      selectionLimit: 1,
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
-      setImage(uri);
-      return { uri, cancelled: false };
+      const newImage = result.assets[0];
+      setImage({
+        uri: newImage.uri,
+        name: newImage.fileName || newImage.uri.split('/').pop() || 'photo.jpg',
+        type: 'image',
+      });
+      return { image: newImage, cancelled: false };
     }
 
-    return { uri: '', cancelled: true };
+    return { image: { uri: '', name: '', type: 'image' }, cancelled: true };
   };
 
   const takePhoto = async (): Promise<PickerResult> => {
@@ -43,7 +65,7 @@ export function useImagePicker() {
     if (status !== 'granted') {
       const msg = 'Permission to access camera was denied';
       setError(msg);
-      return { uri: '', cancelled: true, error: msg };
+      return { image: null, cancelled: true, error: msg };
     }
 
     const result = await ImagePicker.launchCameraAsync({
@@ -53,12 +75,16 @@ export function useImagePicker() {
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
-      setImage(uri);
-      return { uri, cancelled: false };
+      const newImage = result.assets[0];
+      setImage({
+        uri: newImage.uri,
+        name: newImage.fileName || newImage.uri.split('/').pop() || 'photo.jpg',
+        type: 'image',
+      });
+      return { image: newImage, cancelled: false };
     }
 
-    return { uri: '', cancelled: true };
+    return { image: null, cancelled: true };
   };
 
   const clearImage = () => {
@@ -72,5 +98,6 @@ export function useImagePicker() {
     pickFromLibrary,
     takePhoto,
     clearImage,
+    hasPermission,
   };
 }
