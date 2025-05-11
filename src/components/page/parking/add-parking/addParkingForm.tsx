@@ -14,11 +14,13 @@ import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import { z } from 'zod';
 import { toast } from '~/src/components/ui/toast';
 import { useImagePicker } from '~/src/hooks/useImagePicker';
+import { useRouter } from 'expo-router';
 
 type FormInput = z.infer<typeof parkingSchema>;
 
 export const AddParkingForm = () => {
   const { user } = useAuth();
+  const router = useRouter();
   const { image, hasPermission, pickFromLibrary, clearImage } = useImagePicker();
 
   const { mutate: onUpload, isPending: isUploading } = useMutation({
@@ -31,6 +33,7 @@ export const AddParkingForm = () => {
     onSuccess: (data) => {
       if (data.success) {
         toast.success(data.message);
+        router.push('/account/partner');
       } else {
         toast.error(data.message);
       }

@@ -20,6 +20,7 @@ type ParkingEndpointKeys =
   | 'GET_RANDOM_PARKING'
   | 'GET_PARKING_BY_ID'
   | 'PUT_PARKING_PARKING_ID'
+  | 'DELETE_PARKING_PARKING_ID'
   | 'GET_SEARCH_PARKING';
 
 /**
@@ -46,4 +47,5 @@ export const PARKING_ENDPOINT: EndpointT<ParkingEndpointKeys> = {
   POST_ADD_PARKING_GALLERY: '/parking/:id/gallery-image',
   PUT_ADD_PARKING_IMAGE: '/parking/:id/image',
   PUT_PARKING_PARKING_ID: '/parking/:id',
+  DELETE_PARKING_PARKING_ID: '/parking/:id',
 };

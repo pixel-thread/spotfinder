@@ -1,32 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { View, ScrollView } from 'react-native';
 
 import { Container } from '~/src/components/Container';
 import { Typography } from '~/src/components/ui/typography';
 import PlanCard from './planCard';
 
-import { useQuery } from '@tanstack/react-query';
-import http from '~/src/utils/https';
-import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
-import { parkingSchema } from '~/src/utils/validation/parking';
-import { z } from 'zod';
-import { useAuth } from '~/src/hooks/auth/useAuth';
-//uat.streamalive.com/l/rating-polls
-https: type ParkingDetail = z.infer<typeof parkingSchema>;
+import { useLocalSearchParams } from 'expo-router';
 
 export const Pricing = () => {
-  const { user } = useAuth();
-  const [selectedParking, setSelectedParking] = useState<string>('');
-  const { isFetching, data: parkings } = useQuery({
-    queryKey: ['parking', user?.id],
-    queryFn: () =>
-      http.get<Required<ParkingDetail>[]>(
-        PARKING_ENDPOINT.GET_PARKING_BY_USER_ID.replace(':userId', user?.id || '')
-      ),
-    enabled: !!user,
-    select: (data) => data?.data,
-  });
+  const { parking } = useLocalSearchParams();
 
   return (
     <Container className="flex-1">
@@ -57,65 +39,9 @@ export const Pricing = () => {
               </View>
             </View>
           </View>
-
-          {/* Parking Selection with Checkboxes */}
-          <View className="mb-4">
-            <Typography
-              variant="body"
-              className="mb-2 font-medium text-gray-700 dark:text-gray-300">
-              Select Your Parking Space
-            </Typography>
-            <View className="rounded-lg border border-gray-300 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
-              {parkings && parkings.length > 0 ? (
-                parkings.map((parking) => (
-                  <TouchableOpacity
-                    key={parking.id}
-                    className="flex-row items-center justify-between border-b border-gray-200 p-3 dark:border-gray-700"
-                    onPress={() => {
-                      if (selectedParking === parking.id) {
-                        setSelectedParking('');
-                      } else {
-                        setSelectedParking(parking.id);
-                      }
-                    }}>
-                    <View className="flex-1">
-                      <Typography className="font-medium text-gray-800 dark:text-gray-200">
-                        {parking.name || 'Unnamed Parking'}
-                      </Typography>
-                      <Typography className="text-sm text-gray-500 dark:text-gray-400">
-                        {parking.address || 'No address provided'}
-                      </Typography>
-                    </View>
-                    <View className="flex-1">
-                      <Typography className="text-sm text-gray-500 dark:text-gray-400">
-                        {parking.slots.length || 'No slots available'} Slots
-                      </Typography>
-                    </View>
-                    <View
-                      className={`h-6 w-6 items-center justify-center rounded-full border ${
-                        selectedParking === parking.id
-                          ? 'border-blue-500 bg-blue-500'
-                          : 'border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700'
-                      }`}>
-                      {selectedParking === parking.id && (
-                        <Ionicons name="checkmark" size={16} color="#fff" />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <View className="p-3">
-                  <Typography className="text-center text-gray-500 dark:text-gray-400">
-                    {isFetching ? 'Loading parking locations...' : 'No parking locations available'}
-                  </Typography>
-                </View>
-              )}
-            </View>
-          </View>
-
           {/* Plan Card with emphasis */}
           <View className="mb-6">
-            <PlanCard parkingId={selectedParking} />
+            <PlanCard parkingId={parking as string} />
           </View>
         </View>
       </ScrollView>

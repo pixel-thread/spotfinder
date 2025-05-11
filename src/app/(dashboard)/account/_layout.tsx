@@ -4,12 +4,11 @@ import { useColorScheme } from 'react-native';
 export default function ProfileLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-
   return (
     <Stack
       screenOptions={{
-        headerShown: true,
-        headerTitle: 'Account',
+        headerShown: false,
+        headerTitle: 'Partners',
         headerBackButtonDisplayMode: 'generic',
         headerShadowVisible: false,
         headerStyle: {

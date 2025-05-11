@@ -22,4 +22,5 @@ export const parkingSchema = z.object({
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
   rating: z.array(z.string().uuid().optional()).optional(),
   slots: z.array(slotSchema).optional(),
+  image: z.string().url().optional(),
 });

@@ -1,21 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { View, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { View, Image, ScrollView, TouchableOpacity, Modal, Settings } from 'react-native';
 import { z } from 'zod';
-
-import { BookingModal } from '../booking/bookingModal';
 
 import { Container } from '~/src/components/Container';
 import { ParkingDetailSkeleton } from '~/src/components/page/parking/detail/parkingDetailSkeleton';
 import { ParkingNotFoundCard } from '~/src/components/page/parking/parkingNotFound';
-import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
 import { cn } from '~/src/libs';
+import { ParkingDetailFooter } from './parkingDetailFooter';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
@@ -41,7 +39,6 @@ export const ParkingDetailView = ({ parkingId }: { parkingId: string }) => {
   });
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   const { mutate: rateParking } = useMutation({
     mutationKey: ['parking', 'rating', parkingId],
@@ -49,10 +46,6 @@ export const ParkingDetailView = ({ parkingId }: { parkingId: string }) => {
       http.put(PARKING_ENDPOINT.PUT_PARKING_UPDATE_RATING.replace(':id', parking?.id || ''), {}),
     onSuccess: () => refetch(),
   });
-
-  const handleImagePress = (imageUrl: string) => {
-    setSelectedImage(imageUrl);
-  };
 
   const closeImageModal = () => {
     setSelectedImage(null);
@@ -92,7 +85,7 @@ export const ParkingDetailView = ({ parkingId }: { parkingId: string }) => {
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Header Image */}
         <View className="relative h-80 w-full">
-          <Image source={{ uri: parking.image }} className="h-full w-full" resizeMode="cover" />
+          <Image source={{ uri: parking?.image }} className="h-full w-full" resizeMode="cover" />
         </View>
 
         {/* Main Content */}
@@ -171,26 +164,6 @@ export const ParkingDetailView = ({ parkingId }: { parkingId: string }) => {
             </View>
           </View>
 
-          {/* Gallery */}
-          {parking.gallery && parking.gallery.length > 0 && (
-            <View className="mt-6">
-              <Typography variant="caption" className="mb-2 font-semibold">
-                Gallery
-              </Typography>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {parking.gallery.map((image, index) => (
-                  <TouchableOpacity key={index} onPress={() => handleImagePress(image)}>
-                    <Image
-                      source={{ uri: image }}
-                      className="mr-2 h-24 w-32 rounded-lg"
-                      resizeMode="cover"
-                    />
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
           {/* Additional Info */}
           <View className="mt-6 space-y-3 rounded-lg bg-gray-50 p-4">
             <View className="flex-row items-center justify-between">
@@ -212,22 +185,8 @@ export const ParkingDetailView = ({ parkingId }: { parkingId: string }) => {
       </ScrollView>
 
       {/* Bottom Action Bar */}
-      <View className="border-t border-gray-200 bg-white p-4">
-        <Button
-          className="w-full bg-blue-600"
-          disabled={parking.slots?.filter((val) => val.isOccupied === false).length === 0}
-          size="lg"
-          onPress={() => setIsBookingModalOpen(true)}>
-          {parking.slots?.filter((val) => val.isOccupied === false).length === 0
-            ? 'No Available Spots'
-            : 'Book a Spot'}
-        </Button>
-      </View>
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        parkingId={parkingId as string}
-      />
+      {parking.id && <ParkingDetailFooter id={parking.id} />}
     </Container>
   );
 };
+

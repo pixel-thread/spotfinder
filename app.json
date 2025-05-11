@@ -1,10 +1,10 @@
 {
   "expo": {
     "name": "Spot Finder",
-    "slug": "spotfinder",
+    "slug": "spot-finder",
     "jsEngine": "hermes",
     "version": "1.0.0",
-    "scheme": "parking",
+    "scheme": "spotfinder",
     "plugins": [
       "expo-router",
       [
@@ -28,26 +28,28 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.jyrwaboys.parking"
+      "bundleIdentifier": "com.pixel-thread.spotfinder"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jyrwaboys.parking"
+      "package": "com.pixelthread.spotfinder"
     },
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "8c409e50-e7ef-490b-9cad-0ff9486633e1"
+        "projectId": "f21a60bb-9889-44f8-a09b-c6650b6ea778"
       }
     },
-    "owner": "jyrwa-parkingease"
+    "owner": "pixel-thread"
   }
 }

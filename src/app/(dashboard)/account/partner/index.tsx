@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import { Container } from '~/src/components/Container';
 import { ParkingCard } from '~/src/components/page/parking/parkingCard';
-import { ParkingFilter } from '~/src/components/page/parking/parkingFilter';
 import { ParkingSearchCard } from '~/src/components/page/parking/parkingSearchCard';
 import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
@@ -78,16 +77,6 @@ const PartnerParkingPage = () => {
 
   return (
     <Container className="flex-1">
-      {/* Header */}
-      <View className="mt-2 rounded-lg bg-white p-4">
-        {/* Search Bar */}
-
-        <Text className="mb-4 text-xl font-bold text-gray-900">Find Your Parking</Text>
-        <ParkingSearchCard
-          isLoading={isFetching}
-          onPressSearch={(value) => form.setValue('search', value || '')}
-        />
-      </View>
       <Ternary
         condition={isFetching}
         trueComponent={<ParkingCardSkeleton value={10} />}

@@ -1,14 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from 'nativewind';
+import { useMemo } from 'react';
 import { View, TouchableOpacity, Image, ScrollView } from 'react-native';
+
+import { Ternary } from '../../Ternary';
+import { Card } from '../../ui/card';
 
 import { Button } from '~/src/components/ui/button';
 import { Typography } from '~/src/components/ui/typography';
 import { useAuth } from '~/src/hooks/auth/useAuth';
-import { useColorScheme } from 'nativewind';
-import { Card } from '../../ui/card';
-import { Ternary } from '../../Ternary';
-import { useMemo } from 'react';
 
 export const Account = () => {
   const { user, onLogout: signOut } = useAuth();
@@ -39,7 +40,6 @@ export const Account = () => {
         <Typography variant="heading" className="text-xl font-bold">
           {user?.name || 'Guest User'}
         </Typography>
-        <Typography>{user?.auth.email || 'guest@example.com'}</Typography>
       </View>
 
       {/* Account Settings */}
@@ -140,34 +140,12 @@ export const Account = () => {
           <Card className="rounded-xl bg-white">
             <TouchableOpacity
               className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
-              onPress={() => router.push('/account/help')}>
-              <View className="flex-row items-center">
-                <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
-                  <Ionicons name="help-circle-outline" size={20} color="#3b82f6" />
-                </View>
-                <Typography>View Parking</Typography>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
-              onPress={() => router.push('/account/pricing')}>
-              <View className="flex-row items-center">
-                <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
-                  <Ionicons name="help-circle-outline" size={20} color="#3b82f6" />
-                </View>
-                <Typography>Slot</Typography>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="flex-row items-center justify-between border-b border-gray-200  p-4 dark:border-gray-800"
               onPress={() => router.push('/account/partner')}>
               <View className="flex-row items-center">
                 <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                   <Ionicons name="help-circle-outline" size={20} color="#3b82f6" />
                 </View>
-                <Typography>Lot</Typography>
+                <Typography>Added Parking Lot</Typography>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
             </TouchableOpacity>
@@ -179,7 +157,7 @@ export const Account = () => {
                 <View className="mr-3 rounded-full bg-blue-50 p-2 dark:bg-blue-950/30">
                   <Ionicons name="information-circle-outline" size={20} color="#3b82f6" />
                 </View>
-                <Typography>Add Parking</Typography>
+                <Typography>Add New Parking</Typography>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
             </TouchableOpacity>

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Link, Route } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import { z } from 'zod';
 
 import { Typography } from '../../ui/typography';
@@ -16,15 +16,17 @@ type ParkingCardProps = {
 };
 
 export const ParkingCard = ({ parking }: ParkingCardProps) => {
-  const router = useRouter();
   const { user } = useAuth();
   const { colorScheme } = useColorScheme(); // Add this import
-
+  const isOwner = user?.id === parking.userId;
+  const pathUrl = isOwner
+    ? `/(dashboard)/account/partner/update/${parking.id}`
+    : `/(dashboard)/parking/${parking.id}`;
   return (
-    <TouchableOpacity
+    <Link
+      href={pathUrl as Route}
       key={parking.id}
-      onPress={() => router.push(`/parking/${parking.id}`)}
-      className="mb-4 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
+      className="mb-4 w-full overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
       <Image source={{ uri: parking.image }} className="h-40 w-full" resizeMode="cover" />
       <View className="p-4">
         <Typography className="text-lg font-semibold text-gray-900 dark:text-gray-50">
@@ -41,7 +43,7 @@ export const ParkingCard = ({ parking }: ParkingCardProps) => {
           </Typography>
         </View>
 
-        <View className="mb-1 flex-row items-center justify-between">
+        <View className="mb-1 w-full flex-row items-center justify-between">
           <Text className="text-lg font-bold text-gray-900">{parking.name}</Text>
           <View className="flex-row items-center">
             <Ionicons
@@ -77,6 +79,6 @@ export const ParkingCard = ({ parking }: ParkingCardProps) => {
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </Link>
   );
 };
