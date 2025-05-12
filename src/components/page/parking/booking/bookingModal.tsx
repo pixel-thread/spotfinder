@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { View, TouchableOpacity, Modal } from 'react-native';
+import { View, TouchableOpacity, Modal, Platform } from 'react-native';
 import { z } from 'zod';
 
 import { BookingModalSkeleton } from './bookingModalSkeleton';
@@ -13,7 +13,9 @@ import { PARKING_ENDPOINT } from '~/src/libs/endpoints/parking';
 import http from '~/src/utils/https';
 import { parkingSchema } from '~/src/utils/validation/parking';
 import { toast } from '~/src/components/ui/toast';
-import { useRouter } from 'expo-router';
+import { cn } from '~/src/libs';
+
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 type ParkingDetail = z.infer<typeof parkingSchema>;
 
@@ -23,21 +25,16 @@ type BookingModalProps = {
   parkingId: string;
 };
 
-const calculateDuration = ({ startDate, endDate }: { startDate: Date; endDate: Date }) => {
-  const diff = endDate.getTime() - startDate.getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  return `${hours}h ${minutes}m`;
-};
 // Inside the BookingModal component, add this skeleton UI for loading state
 export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) => {
-  const router = useRouter();
+  const [noOfHour, setNoOfHour] = useState(1);
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date(new Date().getTime() + 60 * 60 * 1000)); // Default 1 hour
-  const [selectedSpot, setSelectedSpot] = useState('');
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [activePicker, setActivePicker] = useState<'start' | 'end'>('start');
+  const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date');
 
   const {
     isLoading,
@@ -51,7 +48,7 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
     select: (data) => data?.data,
   });
 
-  const { mutate, isPending } = useMutation({
+  const { isPending } = useMutation({
     mutationFn: () =>
       http.post(PARKING_ENDPOINT.POST_ADD_BOOKING.replace(':id', parkingId), {
         startTime: startDate,
@@ -61,6 +58,7 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
     onSuccess: (data) => {
       if (data.success) {
         toast.success(data.message);
+        queryClient.invalidateQueries({ queryKey: ['parking', parkingId] });
         onClose();
         return data.data;
       }
@@ -72,35 +70,21 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const handleConfirmDate = (date: Date) => {
-    if (activePicker === 'start') {
-      setStartDate(date);
-      // Ensure end time is after start time
-      if (date.getTime() >= endDate.getTime()) {
-        setEndDate(new Date(date.getTime() + 60 * 60 * 1000));
-      }
-    } else {
-      setEndDate(date);
-    }
-    setDatePickerVisible(false);
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const calculatePrice = () => {
-    const hourlyRate = parking?.price || 0;
-    // Calculate hours between start and end time
-    const hours = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-    // Apply minimum 1 hour rule
-    const billableHours = Math.max(1, hours);
-    return `₹${(hourlyRate * billableHours).toFixed(2)}`;
+    const hourlyRate: number = Number(parking?.price) || 0;
+    return `₹${(hourlyRate * noOfHour).toFixed(2)}`;
   };
   const onPressConfirmBooking = () => {
     if (user) {
-      mutate();
+      // TODO: Implement booking logic
     }
     onClose();
-    router.push('/auth');
   };
-  // If loading, show skeleton UI
+
   if (isLoading || isFetching) {
     return <BookingModalSkeleton />;
   }
@@ -124,7 +108,6 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
                 <Ionicons name="close" size={24} color="#6b7280" />
               </TouchableOpacity>
             </View>
-
             {/* Parking Info */}
             <View className="mb-4 rounded-lg bg-blue-50 p-3">
               <Typography className="font-medium">{parking?.name}</Typography>
@@ -133,79 +116,151 @@ export const BookingModal = ({ isOpen, onClose, parkingId }: BookingModalProps) 
                 <Typography className="ml-1 text-blue-600">{parking?.price}/hr</Typography>
               </View>
             </View>
-
+            {/* Start Time Input */}
+            <View className="mb-4">
+              <View className="flex-row gap-2">
+                <View className="flex-1">
+                  <Typography className="mb-1 text-sm text-gray-600">Date</Typography>
+                  <TouchableOpacity
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2"
+                    onPress={() => {
+                      setActivePicker('start');
+                      setPickerMode('date');
+                      setDatePickerVisible(true);
+                    }}>
+                    <Typography className="text-gray-900">{formatDate(startDate)}</Typography>
+                  </TouchableOpacity>
+                </View>
+                <View className="flex-1">
+                  <Typography className="mb-1 text-sm text-gray-600">Time</Typography>
+                  <TouchableOpacity
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2"
+                    onPress={() => {
+                      setActivePicker('start');
+                      setPickerMode('time');
+                      setDatePickerVisible(true);
+                    }}>
+                    <Typography className="text-gray-900">{formatTime(startDate)}</Typography>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
             {/* Time Selection */}
-            <Typography className="mb-2 font-semibold">Select Time</Typography>
-            <View className="mb-4 flex-row justify-between">
-              <TouchableOpacity
-                className="mr-2 flex-1 rounded-lg border border-gray-200 p-3"
-                onPress={() => {
-                  setActivePicker('start');
-                  setDatePickerVisible(true);
-                }}>
-                <Typography className="mb-1 text-sm text-gray-500">Start Time</Typography>
-                <Typography className="font-medium">{formatTime(startDate)}</Typography>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                className="ml-2 flex-1 rounded-lg border border-gray-200 p-3"
-                onPress={() => {
-                  setActivePicker('end');
-                  setDatePickerVisible(true);
-                }}>
-                <Typography className="mb-1 text-sm text-gray-500">End Time</Typography>
-                <Typography className="font-medium">{formatTime(endDate)}</Typography>
-              </TouchableOpacity>
-            </View>
-
-            {/* Spot Selection */}
-            <Typography className="mb-2 font-semibold">Select Spot</Typography>
-            <View className="mb-4 flex-row flex-wrap">
-              {['A-1', 'A-2', 'B-1', 'B-2', 'C-1'].map((spot) => (
+            <View className={cn('mb-6')}>
+              <Typography className="mb-2 font-semibold">Select Hours</Typography>
+              <View
+                className={cn('flex-row items-center justify-between rounded-lg bg-gray-50 p-2')}>
                 <TouchableOpacity
-                  key={spot}
-                  className={`m-1 rounded-lg border p-2 ${
-                    selectedSpot === spot ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                  }`}
-                  onPress={() => setSelectedSpot(spot)}>
-                  <Typography className={selectedSpot === spot ? 'text-blue-600' : 'text-gray-700'}>
-                    {spot}
-                  </Typography>
+                  className={cn('h-9 w-9 items-center justify-center rounded-full bg-gray-200')}
+                  onPress={() => setNoOfHour((prev) => Math.max(1, prev - 1))}>
+                  <Ionicons name="remove" size={20} color="#4b5563" />
                 </TouchableOpacity>
-              ))}
+                <Typography className={cn('text-xl font-semibold text-gray-900')}>
+                  {noOfHour}
+                </Typography>
+                <TouchableOpacity
+                  className={cn('h-9 w-9 items-center justify-center rounded-full bg-blue-500')}
+                  onPress={() => setNoOfHour((prev) => prev + 1)}>
+                  <Ionicons name="add" size={20} color="white" />
+                </TouchableOpacity>
+              </View>
             </View>
-
             {/* Summary */}
             <View className="mb-4 rounded-lg bg-gray-50 p-3">
               <View className="mb-2 flex-row items-center justify-between">
-                <Typography className="text-gray-600">Duration</Typography>
+                <Typography className="text-gray-600">Start Time</Typography>
+                <Typography className="font-medium">{formatTime(startDate)}</Typography>
+              </View>
+              <View className="mb-2 flex-row items-center justify-between">
+                <Typography className="text-gray-600">End Time</Typography>
                 <Typography className="font-medium">
-                  {calculateDuration({ startDate, endDate })}
+                  {formatTime(new Date(startDate.getTime() + noOfHour * 60 * 60 * 1000))}
                 </Typography>
+              </View>
+              <View className="mb-2 flex-row items-center justify-between">
+                <Typography className="text-gray-600">Duration</Typography>
+                <Typography className="font-medium">{noOfHour}h</Typography>
               </View>
               <View className="flex-row items-center justify-between">
                 <Typography className="text-gray-600">Total Price</Typography>
                 <Typography className="text-lg font-bold">{calculatePrice()}</Typography>
               </View>
             </View>
-
             {/* Confirm Button */}
-            <Button onPress={onPressConfirmBooking} disabled={isPending} size="lg">
+            <Button
+              className="rounded-xl"
+              onPress={onPressConfirmBooking}
+              disabled={isPending}
+              size="lg">
               {user ? 'Confirm Booking' : 'Sign In to Book'}
             </Button>
-
-            {/* Date/Time Picker would go here - in a real app you'd use a platform-specific picker */}
+            {/* Date/Time Picker */}
             {isDatePickerVisible && (
-              <View className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white p-4">
-                <Typography className="mb-2 text-center font-medium">
-                  Select {activePicker === 'start' ? 'Start' : 'End'} Time
-                </Typography>
-                {/* This is a placeholder - you would use a real date/time picker component here */}
-                <View className="mb-4 flex-row justify-around">
-                  <Button onPress={() => setDatePickerVisible(false)}>Cancel</Button>
-                  <Button onPress={() => handleConfirmDate(new Date())}>Confirm</Button>
-                </View>
-              </View>
+              <>
+                {Platform.OS === 'android' && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={activePicker === 'start' ? startDate : endDate}
+                    mode={pickerMode}
+                    is24Hour
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      setDatePickerVisible(false);
+                      if (event.type === 'set' && selectedDate) {
+                        if (activePicker === 'start') {
+                          setStartDate(selectedDate);
+                          // Ensure end time is after start time
+                          if (selectedDate.getTime() >= endDate.getTime()) {
+                            setEndDate(new Date(selectedDate.getTime() + 60 * 60 * 1000));
+                          }
+                        } else {
+                          setEndDate(selectedDate);
+                        }
+                      }
+                    }}
+                  />
+                )}
+
+                {Platform.OS === 'ios' && (
+                  <View className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white p-4">
+                    <Typography className="mb-2 text-center font-medium">
+                      Select {activePicker === 'start' ? 'Start' : 'End'}{' '}
+                      {pickerMode === 'date' ? 'Date' : 'Time'}
+                    </Typography>
+                    <View className="items-center justify-center">
+                      <DateTimePicker
+                        testID="dateTimePicker"
+                        value={activePicker === 'start' ? startDate : endDate}
+                        mode={pickerMode}
+                        is24Hour
+                        display="spinner"
+                        onChange={(event, selectedDate) => {
+                          if (selectedDate) {
+                            // Just update the temporary value for preview
+                            if (activePicker === 'start') {
+                              setStartDate(selectedDate);
+                            } else {
+                              setEndDate(selectedDate);
+                            }
+                          }
+                        }}
+                      />
+                    </View>
+
+                    <View className="mt-4 flex-row justify-around">
+                      <Button
+                        variant="outline"
+                        onPress={() => setDatePickerVisible(false)}
+                        className="px-6">
+                        Cancel
+                      </Button>
+                      <Button onPress={() => setDatePickerVisible(false)} className="px-6">
+                        Confirm
+                      </Button>
+                    </View>
+                  </View>
+                )}
+              </>
             )}
           </View>
         )}

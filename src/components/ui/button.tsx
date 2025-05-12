@@ -1,18 +1,19 @@
 import { VariantProps, cva } from 'class-variance-authority';
 import { forwardRef } from 'react';
 import { Pressable, PressableProps, Text } from 'react-native';
+
 import { cn } from '~/src/libs';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-md text-sm font-medium disabled:opacity-50 disabled:pointer-events-none',
+  'inline-flex items-center justify-center shadow-md rounded-xl text-sm font-medium disabled:opacity-50 disabled:pointer-events-none',
   {
     variants: {
       variant: {
-        default: 'bg-blue-500 active:bg-blue-600',
-        destructive: 'bg-red-500 active:bg-red-600',
+        default: 'bg-blue-500 active:bg-blue-600 disabled:bg-blue-400',
+        destructive: 'bg-red-500 active:bg-red-600 disabled:bg-red-400',
         outline: 'border border-gray-300 bg-white active:bg-gray-100',
-        secondary: 'bg-gray-100 active:bg-gray-200',
-        ghost: 'hover:bg-gray-100 active:bg-gray-200',
+        secondary: 'bg-gray-100 active:bg-gray-200 disabled:bg-gray-200',
+        ghost: 'hover:bg-gray-100 active:bg-gray-200 disabled:bg-gray-200 ',
         link: 'underline-offset-4',
       },
       size: {
@@ -57,7 +58,12 @@ type ButtonProps = PressableProps & VariantProps<typeof buttonVariants>;
 const Button = forwardRef<typeof Pressable, ButtonProps>(
   ({ className, variant, size, style, children, ...props }, ref) => {
     return (
-      <Pressable className={cn(buttonVariants({ variant, size, className }))} {...props}>
+      <Pressable
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          'inline-flex items-center justify-center rounded-xl text-sm font-medium shadow-md disabled:pointer-events-none disabled:opacity-50'
+        )}
+        {...props}>
         {typeof children === 'string' ? (
           <Text className={cn(buttonTextVariants({ variant, size }))}>{children}</Text>
         ) : (

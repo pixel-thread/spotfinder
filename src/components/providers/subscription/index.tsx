@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import React from 'react';
 
@@ -16,7 +16,7 @@ type SubscriptionProviderProps = {
 export const SubscriptionProvider = ({ children }: SubscriptionProviderProps) => {
   const router = useRouter();
   const { user } = useAuth();
-
+  const queryClient = useQueryClient();
   const { isLoading, data: plan } = useSuspenseQuery({
     queryFn: () => http.get<PlanT[]>(PLAN_ENDPOINT.GET_PLAN),
     queryKey: ['plan', user],
@@ -37,15 +37,18 @@ export const SubscriptionProvider = ({ children }: SubscriptionProviderProps) =>
 
   const { isPending: isSubscribeLoading, mutate: onSubScribe } = useMutation({
     mutationFn: ({ slot, id }: { slot: number; id: string }) =>
-      http.post(PLAN_ENDPOINT.POST_SUBSCRIBE, {
+      http.post<{ id: string }>(PLAN_ENDPOINT.POST_SUBSCRIBE, {
         slot,
         userId: user?.id,
         parkingLotId: id,
       }),
     onSuccess: (data) => {
       if (data?.success) {
+        const parking = data?.data;
         toast.success(data.message);
-        router.push('/account/partner');
+        router.push(`/parking/${parking?.id}`);
+        queryClient.invalidateQueries({ queryKey: ['parking', parking?.id] });
+        queryClient.invalidateQueries({ queryKey: ['parking'] });
         return data.data;
       }
       toast.error(data.message);
